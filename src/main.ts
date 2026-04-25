@@ -1,5 +1,4 @@
 import './style.css'
-import { setupCounter } from './counter.ts'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <h2>Cliff Walking Reinforcement Learning</h2>
@@ -16,5 +15,3 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </div>
     <canvas id="gridCanvas" width="600" height="240"></canvas>
 `
-
-setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
