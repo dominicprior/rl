@@ -9,7 +9,9 @@ const ROWS = 4, COLS = 10, TILE = 60;
 const ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
 
 let state = { x: 0, y: 3 };
-let qTable: Record<string, Record<string, number> > = {};
+let qTable: Record<string, Record<string, number> >;
+resetQTable();
+
 let episode = 0, steps = 0, totalReward = 0;
 let running = true;
 let history: Array<any> = []; // For Monte Carlo
@@ -133,10 +135,20 @@ function draw() {
 }
 
 function resetSim() {
-    qTable = {};
+    resetQTable();
     episode = 0;
     state = { x: 0, y: 3 };
     if (!running) { running = true; loop(); }
+}
+
+function resetQTable() {
+  qTable = {};
+  for (let y = 0; y < ROWS; y++) {
+    for (let x = 0; x < COLS; x++) {
+      let s = `${x},${y}`;
+      qTable[s] = { UP: 0, DOWN: 0, LEFT: 0, RIGHT: 0 };
+    }
+  }
 }
 
 function initdom() {
