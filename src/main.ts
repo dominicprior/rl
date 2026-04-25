@@ -1,21 +1,76 @@
 import './style.css'
 
-document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
-    <h2>Cliff Walking Reinforcement Learning</h2>
-    <div class="controls">
-        Algorithm: 
-        <select id="algoSelect">
-            <option value="qlearning">Q-Learning (Off-policy)</option>
-            <option value="sarsa">SARSA (On-policy)</option>
-            <option value="montecarlo">Monte Carlo (Every-visit)</option>
-        </select>
-        <button onclick="resetSim()">Reset & Run</button>
-        <div class="stats" id="stats">Episode: 0 | Steps: 0 | Reward: 0</div>
-        <small>Blue = Agent | Red = Cliff | Green = Goal | Yellow arrows = Policy</small>
-    </div>
-    <canvas id="gridCanvas" width="600" height="240"></canvas>
-`
-const canvas = (document.getElementById('gridCanvas') as HTMLCanvasElement);
+const app = document.querySelector<HTMLDivElement>('#app');
+if (!app) throw new Error('#app not found');
+
+// Clear existing content (equivalent to overwriting innerHTML)
+app.replaceChildren();
+
+// <h2>
+const heading = document.createElement('h2');
+heading.textContent = 'Cliff Walking Reinforcement Learning';
+
+// <div class="controls">
+const controls = document.createElement('div');
+controls.className = 'controls';
+
+// Text: "Algorithm: "
+controls.append('Algorithm: ');
+
+// <select id="algoSelect">
+const select = document.createElement('select');
+select.id = 'algoSelect';
+
+// Options
+const options = [
+  { value: 'qlearning', label: 'Q-Learning (Off-policy)' },
+  { value: 'sarsa', label: 'SARSA (On-policy)' },
+  { value: 'montecarlo', label: 'Monte Carlo (Every-visit)' },
+];
+
+for (const opt of options) {
+  const optionEl = document.createElement('option');
+  optionEl.value = opt.value;
+  optionEl.textContent = opt.label;
+  select.appendChild(optionEl);
+}
+
+// <button>
+const button = document.createElement('button');
+button.textContent = 'Reset & Run';
+button.addEventListener('click', () => {
+  resetSim(); // assumes this exists in scope
+});
+
+// <div class="stats" id="stats">
+const stats = document.createElement('div');
+stats.className = 'stats';
+stats.id = 'stats';
+stats.textContent = 'Episode: 0 | Steps: 0 | Reward: 0';
+
+// <small>
+const small = document.createElement('small');
+small.textContent =
+  'Blue = Agent | Red = Cliff | Green = Goal | Yellow arrows = Policy';
+
+// Assemble controls
+controls.appendChild(select);
+controls.appendChild(button);
+controls.appendChild(stats);
+controls.appendChild(small);
+
+// <canvas>
+const canvas = document.createElement('canvas');
+canvas.id = 'gridCanvas';
+canvas.width = 600;
+canvas.height = 240;
+
+// Append everything to #app
+app.appendChild(heading);
+app.appendChild(controls);
+app.appendChild(canvas);
+
+// const canvas = (document.getElementById('gridCanvas') as HTMLCanvasElement);
 const ctx = ((canvas as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D);
 const ROWS = 4, COLS = 10, TILE = 60;
 const ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
