@@ -1,61 +1,10 @@
 import './style.css'
 
-const app = (document.querySelector<HTMLDivElement>('#app') as HTMLDivElement);
+const w = 600;
+const h = 240;
 
-const heading = document.createElement('h2');
-heading.textContent = 'Cliff Walking Reinforcement Learning';
+const ctx = initdom();
 
-const controls = document.createElement('div');
-controls.className = 'controls';
-
-controls.append('Algorithm: ');
-
-const select = document.createElement('select');
-select.id = 'algoSelect';
-
-const options = [
-  { value: 'qlearning', label: 'Q-Learning (Off-policy)' },
-  { value: 'sarsa', label: 'SARSA (On-policy)' },
-  { value: 'montecarlo', label: 'Monte Carlo (Every-visit)' },
-];
-
-for (const opt of options) {
-  const optionEl = document.createElement('option');
-  optionEl.value = opt.value;
-  optionEl.textContent = opt.label;
-  select.appendChild(optionEl);
-}
-
-const button = document.createElement('button');
-button.textContent = 'Reset & Run';
-button.addEventListener('click', () => {
-  resetSim(); // assumes this exists in scope
-});
-
-const stats = document.createElement('div');
-stats.className = 'stats';
-stats.id = 'stats';
-stats.textContent = 'Episode: 0 | Steps: 0 | Reward: 0';
-
-const small = document.createElement('small');
-small.textContent =
-  'Blue = Agent | Red = Cliff | Green = Goal | Yellow arrows = Policy';
-
-controls.appendChild(select);
-controls.appendChild(button);
-controls.appendChild(stats);
-controls.appendChild(small);
-
-const canvas = (document.createElement('canvas') as HTMLCanvasElement);
-canvas.id = 'gridCanvas';
-canvas.width = 600;
-canvas.height = 240;
-
-app.appendChild(heading);
-app.appendChild(controls);
-app.appendChild(canvas);
-
-const ctx = (canvas.getContext('2d') as CanvasRenderingContext2D);
 const ROWS = 4, COLS = 10, TILE = 60;
 const ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
 
@@ -146,7 +95,7 @@ async function loop() {
 }
 
 function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, w, h);
     for (let y = 0; y < ROWS; y++) {
         for (let x = 0; x < COLS; x++) {
             let s = `${x},${y}`;
@@ -188,6 +137,64 @@ function resetSim() {
     episode = 0;
     state = { x: 0, y: 3 };
     if (!running) { running = true; loop(); }
+}
+
+function initdom() {
+  const app = (document.querySelector<HTMLDivElement>('#app') as HTMLDivElement);
+
+  const heading = document.createElement('h2');
+  heading.textContent = 'Cliff Walking Reinforcement Learning';
+
+  const controls = document.createElement('div');
+  controls.className = 'controls';
+
+  controls.append('Algorithm: ');
+
+  const select = document.createElement('select');
+  select.id = 'algoSelect';
+
+  const options = [
+    { value: 'qlearning', label: 'Q-Learning (Off-policy)' },
+    { value: 'sarsa', label: 'SARSA (On-policy)' },
+    { value: 'montecarlo', label: 'Monte Carlo (Every-visit)' },
+  ];
+
+  for (const opt of options) {
+    const optionEl = document.createElement('option');
+    optionEl.value = opt.value;
+    optionEl.textContent = opt.label;
+    select.appendChild(optionEl);
+  }
+
+  const button = document.createElement('button');
+  button.textContent = 'Reset & Run';
+  button.addEventListener('click', () => {
+    resetSim(); // assumes this exists in scope
+  });
+
+  const stats = document.createElement('div');
+  stats.className = 'stats';
+  stats.id = 'stats';
+  stats.textContent = 'Episode: 0 | Steps: 0 | Reward: 0';
+
+  const small = document.createElement('small');
+  small.textContent =
+    'Blue = Agent | Red = Cliff | Green = Goal | Yellow arrows = Policy';
+
+  controls.appendChild(select);
+  controls.appendChild(button);
+  controls.appendChild(stats);
+  controls.appendChild(small);
+
+  const canvas = (document.createElement('canvas') as HTMLCanvasElement);
+  canvas.id = 'gridCanvas';
+  canvas.width = w;
+  canvas.height = h;
+
+  app.appendChild(heading);
+  app.appendChild(controls);
+  app.appendChild(canvas);
+  return (canvas.getContext('2d') as CanvasRenderingContext2D);
 }
 
 loop();
