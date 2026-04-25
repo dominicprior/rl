@@ -2,6 +2,7 @@ import './style.css'
 
 const w = 600;
 const h = 240;
+let timeout = 1000;
 
 const ctx = initdom();
 
@@ -92,7 +93,7 @@ async function loop() {
             s = `0,3`;
             a = chooseAction(s);
         }
-        await new Promise(r => setTimeout(r, 10));
+        await new Promise(r => setTimeout(r, timeout));
     }
 }
 
@@ -181,7 +182,19 @@ function initdom() {
   const button = document.createElement('button');
   button.textContent = 'Reset & Run';
   button.addEventListener('click', () => {
-    resetSim(); // assumes this exists in scope
+    resetSim();
+  });
+
+  const fastButton = document.createElement('button');
+  fastButton.textContent = 'Faster';
+  fastButton.addEventListener('click', () => {
+    timeout /= 2;
+  });
+
+  const slowButton = document.createElement('button');
+  slowButton.textContent = 'Slower';
+  slowButton.addEventListener('click', () => {
+    timeout *= 2;
   });
 
   const stats = document.createElement('div');
@@ -195,6 +208,8 @@ function initdom() {
 
   controls.appendChild(select);
   controls.appendChild(button);
+  controls.appendChild(fastButton);
+  controls.appendChild(slowButton);
   controls.appendChild(stats);
   controls.appendChild(small);
 
