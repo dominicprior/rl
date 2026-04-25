@@ -15,29 +15,29 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     </div>
     <canvas id="gridCanvas" width="600" height="240"></canvas>
 `
-const canvas = document.getElementById('gridCanvas');
-const ctx = canvas.getContext('2d');
+const canvas = (document.getElementById('gridCanvas') as HTMLCanvasElement);
+const ctx = ((canvas as HTMLCanvasElement).getContext('2d') as CanvasRenderingContext2D);
 const ROWS = 4, COLS = 10, TILE = 60;
 const ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
 
 let state = { x: 0, y: 3 };
-let qTable = {};
+let qTable: Record<string, Record<string, number> > = {};
 let episode = 0, steps = 0, totalReward = 0;
 let running = true;
-let history = []; // For Monte Carlo
+let history: Array<any> = []; // For Monte Carlo
 
-function getQ(s, a) {
+function getQ(s: string, a: string) {
     if (!qTable[s]) qTable[s] = { UP: 0, DOWN: 0, LEFT: 0, RIGHT: 0 };
     return qTable[s][a];
 }
 
-function chooseAction(s, epsilon = 0.1) {
+function chooseAction(s: string, epsilon = 0.1) {
     if (Math.random() < epsilon) return ACTIONS[Math.floor(Math.random() * 4)];
     let scores = ACTIONS.map(a => getQ(s, a));
     return ACTIONS[scores.indexOf(Math.max(...scores))];
 }
 
-function move(s, a) {
+function move(s: {x: number, y: number}, a: string) {
     let next = { x: s.x, y: s.y };
     if (a === 'UP') next.y = Math.max(0, s.y - 1);
     if (a === 'DOWN') next.y = Math.min(ROWS - 1, s.y + 1);
@@ -59,7 +59,7 @@ function move(s, a) {
 }
 
 async function loop() {
-    let algo = document.getElementById('algoSelect').value;
+    let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
     let s = `${state.x},${state.y}`;
     let a = chooseAction(s);
     
@@ -84,7 +84,7 @@ async function loop() {
         totalReward += reward;
 
         draw();
-        document.getElementById('stats').innerText = `Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
+        (document.getElementById('stats') as HTMLDivElement).innerText = `Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
 
         if (done || steps > 500) {
             if (algo === 'montecarlo') {
@@ -130,7 +130,7 @@ function draw() {
                 let bestA = ACTIONS[ACTIONS.map(act => getQ(s, act)).indexOf(Math.max(...ACTIONS.map(act => getQ(s, act))))];
                 ctx.fillStyle = "rgba(255, 215, 0, 0.5)";
                 ctx.font = "20px Arial";
-                let arrow = { UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA];
+                let arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
                 if (Math.max(...ACTIONS.map(act => getQ(s, act))) !== 0) {
                     ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
                 }
