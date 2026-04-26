@@ -5,6 +5,7 @@ const h = 240;
 let timeout = 1000;
 let logging = false;
 let gamma = 0.9;
+let epsilon = 0.1;
 
 const ctx = initdom();
 
@@ -19,7 +20,7 @@ let episode = 0, steps = 0, totalReward = 0;
 let running = true;
 let history: Array<any> = []; // For Monte Carlo
 
-function chooseAction(s: string, epsilon = 0.1) {
+function chooseAction(s: string) {
   if (Math.random() < epsilon) return ACTIONS[Math.floor(Math.random() * 4)];
   let scores = ACTIONS.map(a => qTable[s][a]);
   return ACTIONS[scores.indexOf(Math.max(...scores))];
