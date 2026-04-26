@@ -2,7 +2,8 @@ import './style.css'
 
 const w = 600;
 const h = 240;
-let timeout = 100;
+let timeout = 1000;
+let logging = false;
 
 const ctx = initdom();
 
@@ -57,6 +58,9 @@ async function loop() {
     if (algo === 'qlearning') {
       let maxNextQ = Math.max(...ACTIONS.map(act => qTable[sNext][act]));
       qTable[s][a] += 0.1 * (reward + 0.9 * maxNextQ - qTable[s][a]);
+      if (logging) {
+        console.log(s, a, qTable[s][a]);
+      }
     } else if (algo === 'sarsa') {
       qTable[s][a] += 0.1 * (reward + 0.9 * qTable[sNext][aNext] - qTable[s][a]);
     } else if (algo === 'montecarlo') {
@@ -195,6 +199,12 @@ function initdom() {
     timeout *= 2;
   });
 
+  const loggingButton = document.createElement('button');
+  loggingButton.textContent = 'Toggle logging';
+  loggingButton.addEventListener('click', () => {
+    logging = !logging;
+  });
+
   const stats = document.createElement('div');
   stats.className = 'stats';
   stats.id = 'stats';
@@ -208,6 +218,7 @@ function initdom() {
   controls.appendChild(button);
   controls.appendChild(fastButton);
   controls.appendChild(slowButton);
+  controls.appendChild(loggingButton);
   controls.appendChild(stats);
   controls.appendChild(small);
 
