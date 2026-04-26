@@ -74,18 +74,17 @@ async function loop() {
     let { next, reward, done } = nextState(state, a);  // calc the next state
     let sNext = `${next.x},${next.y}`;
     let aNext = action(sNext);  // calc what the action would be from that next state
-
     let q = qTable[s][a];
-    if (algo === 'qlearning') {
-      let maxNextQ = highestScore(sNext);
-      let target = reward + gamma * maxNextQ;
+    
+    if (algo !== 'montecarlo') {
+      let target = algo === 'qlearning' ?
+            reward + gamma * highestScore(sNext) :
+            reward + gamma * qTable[sNext][aNext];
       qTable[s][a] += alpha * (target - q);
-      log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'nextQ=' + maxNextQ, 'newQ=' + qTable[s][a]);
+
+      log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qTable[s][a]);
     }
-    else if (algo === 'sarsa') {
-      qTable[s][a] += alpha * (reward + gamma * qTable[sNext][aNext] - qTable[s][a]);
-    }
-    else if (algo === 'montecarlo') {
+    else {
       history.push({ s, a, r: reward });
     }
 
