@@ -4,6 +4,7 @@ const w = 600;
 const h = 240;
 let timeout = 1000;
 let logging = false;
+let gamma = 0.9;
 
 const ctx = initdom();
 
@@ -57,12 +58,12 @@ async function loop() {
 
     if (algo === 'qlearning') {
       let maxNextQ = Math.max(...ACTIONS.map(act => qTable[sNext][act]));
-      qTable[s][a] += 0.1 * (reward + 0.9 * maxNextQ - qTable[s][a]);
+      qTable[s][a] += 0.1 * (reward + gamma * maxNextQ - qTable[s][a]);
       if (logging) {
         console.log(s, a, qTable[s][a]);
       }
     } else if (algo === 'sarsa') {
-      qTable[s][a] += 0.1 * (reward + 0.9 * qTable[sNext][aNext] - qTable[s][a]);
+      qTable[s][a] += 0.1 * (reward + gamma * qTable[sNext][aNext] - qTable[s][a]);
     } else if (algo === 'montecarlo') {
       history.push({ s, a, r: reward });
     }
@@ -80,7 +81,7 @@ async function loop() {
       if (algo === 'montecarlo') {
         let G = 0;
         for (let i = history.length - 1; i >= 0; i--) {
-          G = history[i].r + 0.9 * G;
+          G = history[i].r + gamma * G;
           qTable[history[i].s][history[i].a] += 0.05 * (G - qTable[history[i].s][history[i].a]);
         }
         history = [];
