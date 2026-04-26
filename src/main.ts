@@ -119,7 +119,7 @@ function draw() {
       // Draw Policy Arrows
       if (qTable[s]) {
         let bestA = ACTIONS[ACTIONS.map(act => getQ(s, act)).indexOf(Math.max(...ACTIONS.map(act => getQ(s, act))))];
-        ctx.fillStyle = "rgba(255, 215, 0, 0.5)";
+        ctx.fillStyle = "rgba(72, 61, 1, 0.5)";
         ctx.font = "20px Arial";
         let arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
         if (Math.max(...ACTIONS.map(act => getQ(s, act))) !== 0) {
