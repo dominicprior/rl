@@ -2,7 +2,7 @@ import './style.css'
 
 const w = 600;
 const h = 240;
-let timeout = 1000;
+let timeout = 100;
 
 const ctx = initdom();
 
@@ -17,14 +17,9 @@ let episode = 0, steps = 0, totalReward = 0;
 let running = true;
 let history: Array<any> = []; // For Monte Carlo
 
-function getQ(s: string, a: string) {
-  if (!qTable[s]) qTable[s] = { UP: 0, DOWN: 0, LEFT: 0, RIGHT: 0 };
-  return qTable[s][a];
-}
-
 function chooseAction(s: string, epsilon = 0.1) {
   if (Math.random() < epsilon) return ACTIONS[Math.floor(Math.random() * 4)];
-  let scores = ACTIONS.map(a => getQ(s, a));
+  let scores = ACTIONS.map(a => qTable[s][a]);
   return ACTIONS[scores.indexOf(Math.max(...scores))];
 }
 
@@ -60,10 +55,10 @@ async function loop() {
     let aNext = chooseAction(sNext);
 
     if (algo === 'qlearning') {
-      let maxNextQ = Math.max(...ACTIONS.map(act => getQ(sNext, act)));
+      let maxNextQ = Math.max(...ACTIONS.map(act => qTable[sNext][act]));
       qTable[s][a] += 0.1 * (reward + 0.9 * maxNextQ - qTable[s][a]);
     } else if (algo === 'sarsa') {
-      qTable[s][a] += 0.1 * (reward + 0.9 * getQ(sNext, aNext) - qTable[s][a]);
+      qTable[s][a] += 0.1 * (reward + 0.9 * qTable[sNext][aNext] - qTable[s][a]);
     } else if (algo === 'montecarlo') {
       history.push({ s, a, r: reward });
     }
@@ -118,11 +113,14 @@ function draw() {
 
       // Draw Policy Arrows
       if (qTable[s]) {
-        let bestA = ACTIONS[ACTIONS.map(act => getQ(s, act)).indexOf(Math.max(...ACTIONS.map(act => getQ(s, act))))];
+        const row = ACTIONS.map(act => qTable[s][act]);
+        const max = Math.max(...row);
+        const bestI = row.indexOf(max);
+        const bestA = ACTIONS[bestI];
         ctx.fillStyle = "rgba(72, 61, 1, 0.5)";
         ctx.font = "20px Arial";
-        let arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
-        if (Math.max(...ACTIONS.map(act => getQ(s, act))) !== 0) {
+        const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
+        if (max !== 0) {
             ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
         }
       }
