@@ -134,13 +134,13 @@ function draw() {
         if (y !== 3 || x === 0) {
           ctx.fillStyle = '#000000';
           let ww = Math.min(-qTable[s]['UP'] * 20, TILE - 4);
-          ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 4);
+          ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
           ww = Math.min(-qTable[s]['DOWN'] * 20, TILE - 4);
-          ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 6, ww, 4);
+          ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
           let hh = Math.min(-qTable[s]['LEFT'] * 20, TILE - 4);
-          ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 4, hh);
+          ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
           hh = Math.min(-qTable[s]['RIGHT'] * 20, TILE - 4);
-          ctx.fillRect((x+1) * TILE - 6, y * TILE + TILE/2 - hh/2, 4, hh);
+          ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
         }
       }
     }
