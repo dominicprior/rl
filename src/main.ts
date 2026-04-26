@@ -21,13 +21,30 @@ let episode = 0, steps = 0, totalReward = 0;
 let running = true;
 let history: Array<any> = []; // For Monte Carlo
 
-function chooseAction(s: string) {
-  if (Math.random() < epsilon) return ACTIONS[Math.floor(Math.random() * 4)];
-  let scores = ACTIONS.map(a => qTable[s][a]);
-  return ACTIONS[scores.indexOf(Math.max(...scores))];
+function action(s: string) {
+  if (Math.random() < epsilon) {
+    return ACTIONS[Math.floor(Math.random() * 4)];
+  }
+  else {
+    return highestAction(s);
+  }
 }
 
-function move(s: {x: number, y: number}, a: string) {
+function highestAction(s: string) {
+  let ss = scores(s);
+  let i = ss.indexOf(highestScore(s));  // 0, 1, 2 or 3
+  return ACTIONS[i];  // 'UP', 'DOWN', 'LEFT' or 'RIGHT'
+}
+
+function highestScore(s: string) {
+  return Math.max(...scores(s));
+}
+
+function scores(s: string) {
+  return ACTIONS.map(a => qTable[s][a]);  // the four possible next scores
+}
+
+function nextState(s: {x: number, y: number}, a: string) {
   let next = { x: s.x, y: s.y };
   if (a === 'UP') next.y = Math.max(0, s.y - 1);
   if (a === 'DOWN') next.y = Math.min(ROWS - 1, s.y + 1);
@@ -51,22 +68,22 @@ function move(s: {x: number, y: number}, a: string) {
 async function loop() {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   let s = `${state.x},${state.y}`;
-  let a = chooseAction(s);
+  let a = action(s);
   
   while (running) {
-    let { next, reward, done } = move(state, a);
+    let { next, reward, done } = nextState(state, a);  // calc the next state
     let sNext = `${next.x},${next.y}`;
-    let aNext = chooseAction(sNext);
+    let aNext = action(sNext);  // calc what the action would be from that next state
 
+    let q = qTable[s][a];
     if (algo === 'qlearning') {
-      let maxNextQ = Math.max(...ACTIONS.map(act => qTable[sNext][act]));
-      let q = qTable[s][a];
+      let maxNextQ = highestScore(sNext);
       let target = reward + gamma * maxNextQ;
-      qTable[s][a] += 0.1 * (target - q);
+      qTable[s][a] += alpha * (target - q);
       log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'nextQ=' + maxNextQ, 'newQ=' + qTable[s][a]);
     }
     else if (algo === 'sarsa') {
-      qTable[s][a] += 0.1 * (reward + gamma * qTable[sNext][aNext] - qTable[s][a]);
+      qTable[s][a] += alpha * (reward + gamma * qTable[sNext][aNext] - qTable[s][a]);
     }
     else if (algo === 'montecarlo') {
       history.push({ s, a, r: reward });
@@ -95,7 +112,7 @@ async function loop() {
       totalReward = 0;
       state = { x: 0, y: 3 };
       s = `0,3`;
-      a = chooseAction(s);
+      a = action(s);
     }
     await new Promise(r => setTimeout(r, timeout));
   }
@@ -136,13 +153,13 @@ function draw() {
         // Draw the four q-values
         if (y !== 3 || x === 0) {
           ctx.fillStyle = '#000000';
-          let ww = Math.min(-qTable[s]['UP'] * 20, TILE - 4);
+          let ww = Math.min(-qTable[s]['UP'] * 60, TILE - 4);
           ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
-          ww = Math.min(-qTable[s]['DOWN'] * 20, TILE - 4);
+          ww = Math.min(-qTable[s]['DOWN'] * 60, TILE - 4);
           ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
-          let hh = Math.min(-qTable[s]['LEFT'] * 20, TILE - 4);
+          let hh = Math.min(-qTable[s]['LEFT'] * 60, TILE - 4);
           ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
-          hh = Math.min(-qTable[s]['RIGHT'] * 20, TILE - 4);
+          hh = Math.min(-qTable[s]['RIGHT'] * 60, TILE - 4);
           ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
         }
       }
