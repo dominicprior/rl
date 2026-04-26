@@ -117,7 +117,7 @@ function draw() {
         const max = Math.max(...row);
         const bestI = row.indexOf(max);
         const bestA = ACTIONS[bestI];
-        ctx.fillStyle = "rgba(72, 61, 1, 0.5)";
+        ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.font = "20px Arial";
         const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
         if (max !== 0) {
@@ -127,7 +127,7 @@ function draw() {
     }
   }
   // Draw Agent
-  ctx.fillStyle = 'blue';
+  ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
   ctx.beginPath();
   ctx.arc(state.x * TILE + TILE/2, state.y * TILE + TILE/2, 15, 0, Math.PI * 2);
   ctx.fill();
