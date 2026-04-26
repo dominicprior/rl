@@ -1,11 +1,12 @@
 import './style.css'
-
 const w = 600;
 const h = 240;
-let timeout = 1000;
-let logging = false;
-let gamma = 0.9;
-let epsilon = 0.1;
+let timeout = 300;
+let logging = true;
+
+let gamma = 1;
+let epsilon = 0;
+let alpha = 0.1;
 
 const ctx = initdom();
 
