@@ -59,13 +59,15 @@ async function loop() {
 
     if (algo === 'qlearning') {
       let maxNextQ = Math.max(...ACTIONS.map(act => qTable[sNext][act]));
-      qTable[s][a] += 0.1 * (reward + gamma * maxNextQ - qTable[s][a]);
-      if (logging) {
-        console.log(s, a, qTable[s][a]);
-      }
-    } else if (algo === 'sarsa') {
+      let q = qTable[s][a];
+      let target = reward + gamma * maxNextQ;
+      qTable[s][a] += 0.1 * (target - q);
+      log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'nextQ=' + maxNextQ, 'newQ=' + qTable[s][a]);
+    }
+    else if (algo === 'sarsa') {
       qTable[s][a] += 0.1 * (reward + gamma * qTable[sNext][aNext] - qTable[s][a]);
-    } else if (algo === 'montecarlo') {
+    }
+    else if (algo === 'montecarlo') {
       history.push({ s, a, r: reward });
     }
 
@@ -248,4 +250,12 @@ function initdom() {
   return (canvas.getContext('2d') as CanvasRenderingContext2D);
 }
 
+function log(...args: any[]): void {
+  if (logging) {
+    console.log(...args);
+  }
+}
+
+draw();
+await new Promise(r => setTimeout(r, timeout));
 loop();
