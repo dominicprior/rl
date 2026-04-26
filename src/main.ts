@@ -117,17 +117,30 @@ function draw() {
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
 
-      // Draw Policy Arrows
       if (qTable[s]) {
-        const row = ACTIONS.map(act => qTable[s][act]);
-        const max = Math.max(...row);
-        const bestI = row.indexOf(max);
-        const bestA = ACTIONS[bestI];
+        // Draw a policy arrow
+        const qValues = ACTIONS.map(act => qTable[s][act]);  // qValues[0] == UP q-value
+        const max = Math.max(...qValues);    // e.g. -1.6
+        const bestI = qValues.indexOf(max);  // e.g. 2
+        const bestA = ACTIONS[bestI];        // e.g. 'LEFT'
         ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.font = "20px Arial";
         const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
         if (max !== 0) {
             ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
+        }
+
+        // Draw the four q-values
+        if (y !== 3 || x === 0) {
+          ctx.fillStyle = '#000000';
+          let ww = Math.min(-qTable[s]['UP'] * 20, TILE - 4);
+          ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 4);
+          ww = Math.min(-qTable[s]['DOWN'] * 20, TILE - 4);
+          ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 6, ww, 4);
+          let hh = Math.min(-qTable[s]['LEFT'] * 20, TILE - 4);
+          ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 4, hh);
+          hh = Math.min(-qTable[s]['RIGHT'] * 20, TILE - 4);
+          ctx.fillRect((x+1) * TILE - 6, y * TILE + TILE/2 - hh/2, 4, hh);
         }
       }
     }
