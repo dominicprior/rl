@@ -17,7 +17,6 @@ let qTable: Record<string, Record<string, number> >;
 resetQTable();
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
-let running = true;
 let resetting = false;
 let history: Array<any> = []; // For Monte Carlo
 
@@ -75,7 +74,7 @@ async function loop() {
   let s = `${state.x},${state.y}`;
   let a = action(s);
   
-  while (running) {
+  while (true) {
     let { next, reward, done } = nextState(state, a);  // calc the next state
     let sNext = `${next.x},${next.y}`;
     let aNext = action(sNext);  // calc what the action would be from that next state
