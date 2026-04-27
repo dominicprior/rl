@@ -11,6 +11,7 @@ let alpha = 0.1;
 const ctx = initdom();
 
 let qValueScale = 2;  // pixels per unit q-value
+let maxNegQValue = 0; // apart from ones bordering the cliff
 const ROWS = 4, COLS = 10, TILE = 60;
 
 let state = { x: 0, y: 3 };
@@ -86,8 +87,13 @@ async function loop() {
             reward + gamma * highestScore(sNext) :
             reward + gamma * qTable[sNext][aNext];
       qTable[s][a] += alpha * (target - q);
+      if (-qTable[s][a] > maxNegQValue && reward !== -100) {
+        maxNegQValue = -qTable[s][a];
+      }
+            
 
       log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qTable[s][a]);
+      log(maxNegQValue);
     }
     else {
       history.push({ s, a, r: reward });
@@ -105,7 +111,7 @@ async function loop() {
       `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
 
     if (resetting) {
-      totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
+      totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
       state = { x: 0, y: 3 };
       s = '0,3';
       a = action(s);
