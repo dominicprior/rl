@@ -1,7 +1,7 @@
 import './style.css'
 const w = 600;
 const h = 240;
-let timeout = 1000;
+let timeout = 100;
 let logging = false;
 
 let gamma = 1;
@@ -10,9 +10,9 @@ let alpha = 0.1;
 
 const ctx = initdom();
 
-let qValueScale = 2;  // pixels per unit q-value
-let maxNegQValue = 0; // apart from ones bordering the cliff
 const ROWS = 4, COLS = 10, TILE = 60;
+let qValueScale = TILE;  // pixels per unit q-value
+let maxNegQValue = 0; // apart from ones bordering the cliff
 
 let state = { x: 0, y: 3 };
 let qTable: Record<string, Record<string, number> >;
@@ -89,8 +89,10 @@ async function loop() {
       qTable[s][a] += alpha * (target - q);
       if (-qTable[s][a] > maxNegQValue && reward !== -100) {
         maxNegQValue = -qTable[s][a];
+        if (maxNegQValue * qValueScale > 0.9 * TILE) {
+          qValueScale /= 2;
+        }
       }
-            
 
       log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qTable[s][a]);
       log(maxNegQValue);
