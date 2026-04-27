@@ -16,7 +16,7 @@ let state = { x: 0, y: 3 };
 let qTable: Record<string, Record<string, number> >;
 resetQTable();
 
-let episode = 0, steps = 0, totalReward = 0;
+let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let running = true;
 let history: Array<any> = []; // For Monte Carlo
 
@@ -96,10 +96,12 @@ async function loop() {
     s = sNext;
     a = aNext;
     steps++;
+    totalSteps++;
     totalReward += reward;
 
     draw();
-    (document.getElementById('stats') as HTMLDivElement).innerText = `Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
+    (document.getElementById('stats') as HTMLDivElement).innerText =
+      `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
 
     if (done || steps > 500) {
       if (algo === 'montecarlo') {
@@ -258,7 +260,7 @@ function initdom() {
   const stats = document.createElement('div');
   stats.className = 'stats';
   stats.id = 'stats';
-  stats.textContent = 'Episode: 0 | Steps: 0 | Reward: 0';
+  stats.textContent = 'Total Steps: 0 | Episode: 0 | Steps: 0 | Reward: 0';
 
   const small = document.createElement('small');
   small.textContent =
