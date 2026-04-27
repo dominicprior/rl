@@ -18,6 +18,7 @@ resetQTable();
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let running = true;
+let resetting = false;
 let history: Array<any> = []; // For Monte Carlo
 
 function action(s: string): string {
@@ -103,7 +104,15 @@ async function loop() {
     (document.getElementById('stats') as HTMLDivElement).innerText =
       `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
 
-    if (done || steps > 500) {
+    if (resetting) {
+      totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
+      state = { x: 0, y: 3 };
+      s = '0,3';
+      a = action(s);
+      resetQTable();
+      resetting = false;
+    }
+    else if (done || steps > 500) {
       if (algo === 'montecarlo') {
         let G = 0;
         for (let i = history.length - 1; i >= 0; i--) {
@@ -185,10 +194,7 @@ function draw() {
 }
 
 function resetSim() {
-  resetQTable();
-  episode = 0;
-  state = { x: 0, y: 3 };
-  if (!running) { running = true; loop(); }
+  resetting = true;
 }
 
 function resetQTable() {
