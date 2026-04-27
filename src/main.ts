@@ -1,8 +1,8 @@
 import './style.css'
 const w = 600;
 const h = 240;
-let timeout = 300;
-let logging = true;
+let timeout = 1000;
+let logging = false;
 
 let gamma = 1;
 let epsilon = 0;
@@ -10,6 +10,7 @@ let alpha = 0.1;
 
 const ctx = initdom();
 
+let qValueScale = 2;  // pixels per unit q-value
 const ROWS = 4, COLS = 10, TILE = 60;
 
 let state = { x: 0, y: 3 };
@@ -166,19 +167,19 @@ function draw() {
           ctx.fillStyle = '#000000';
           const q = qTable[s];
           if ('UP' in q) {
-            const ww = Math.min(-q['UP'] * 60, TILE - 4);
+            const ww = Math.min(-q['UP'] * qValueScale, TILE - 4);
             ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
           }
           if ('DOWN' in q) {
-            const ww = Math.min(-q['DOWN'] * 60, TILE - 4);
+            const ww = Math.min(-q['DOWN'] * qValueScale, TILE - 4);
             ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
           }
           if ('LEFT' in q) {
-            const hh = Math.min(-q['LEFT'] * 60, TILE - 4);
+            const hh = Math.min(-q['LEFT'] * qValueScale, TILE - 4);
             ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
           }
           if ('RIGHT' in q) {
-            const hh = Math.min(-q['RIGHT'] * 60, TILE - 4);
+            const hh = Math.min(-q['RIGHT'] * qValueScale, TILE - 4);
             ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
           }
         }
