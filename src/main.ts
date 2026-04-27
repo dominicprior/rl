@@ -11,7 +11,6 @@ let alpha = 0.1;
 const ctx = initdom();
 
 const ROWS = 4, COLS = 10, TILE = 60;
-const ACTIONS = ['UP', 'DOWN', 'LEFT', 'RIGHT'];
 
 let state = { x: 0, y: 3 };
 let qTable: Record<string, Record<string, number> >;
@@ -21,27 +20,32 @@ let episode = 0, steps = 0, totalReward = 0;
 let running = true;
 let history: Array<any> = []; // For Monte Carlo
 
-function action(s: string) {
+function action(s: string): string {
   if (Math.random() < epsilon) {
-    return ACTIONS[Math.floor(Math.random() * 4)];
+    const actions = Object.keys(qTable[s]);
+    return actions[Math.floor(Math.random() * actions.length)];
   }
   else {
     return highestAction(s);
   }
 }
 
-function highestAction(s: string) {
+function highestAction(s: string): string {
   let ss = scores(s);
   let i = ss.indexOf(highestScore(s));  // 0, 1, 2 or 3
-  return ACTIONS[i];  // 'UP', 'DOWN', 'LEFT' or 'RIGHT'
+  return actions(s)[i];  // 'UP', 'DOWN', 'LEFT' or 'RIGHT'
 }
 
-function highestScore(s: string) {
+function highestScore(s: string): number {
   return Math.max(...scores(s));
 }
 
-function scores(s: string) {
-  return ACTIONS.map(a => qTable[s][a]);  // the four possible next scores
+function actions(s: string): Array<string> {
+  return Object.keys(qTable[s]);
+}
+
+function scores(s: string): Array<number> {
+  return Object.values(qTable[s]);
 }
 
 function nextState(s: {x: number, y: number}, a: string) {
@@ -138,10 +142,8 @@ function draw() {
 
       if (qTable[s]) {
         // Draw a policy arrow
-        const qValues = ACTIONS.map(act => qTable[s][act]);  // qValues[0] == UP q-value
-        const max = Math.max(...qValues);    // e.g. -1.6
-        const bestI = qValues.indexOf(max);  // e.g. 2
-        const bestA = ACTIONS[bestI];        // e.g. 'LEFT'
+        const max = highestScore(s);    // e.g. -1.6
+        const bestA = highestAction(s);  // e.g. 2
         ctx.fillStyle = "rgba(0, 0, 0, 1)";
         ctx.font = "20px Arial";
         const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
@@ -152,14 +154,23 @@ function draw() {
         // Draw the four q-values
         if (y !== 3 || x === 0) {
           ctx.fillStyle = '#000000';
-          let ww = Math.min(-qTable[s]['UP'] * 60, TILE - 4);
-          ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
-          ww = Math.min(-qTable[s]['DOWN'] * 60, TILE - 4);
-          ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
-          let hh = Math.min(-qTable[s]['LEFT'] * 60, TILE - 4);
-          ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
-          hh = Math.min(-qTable[s]['RIGHT'] * 60, TILE - 4);
-          ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
+          const q = qTable[s];
+          if ('UP' in q) {
+            const ww = Math.min(-q['UP'] * 60, TILE - 4);
+            ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
+          }
+          if ('DOWN' in q) {
+            const ww = Math.min(-q['DOWN'] * 60, TILE - 4);
+            ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
+          }
+          if ('LEFT' in q) {
+            const hh = Math.min(-q['LEFT'] * 60, TILE - 4);
+            ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
+          }
+          if ('RIGHT' in q) {
+            const hh = Math.min(-q['RIGHT'] * 60, TILE - 4);
+            ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
+          }
         }
       }
     }
@@ -183,7 +194,12 @@ function resetQTable() {
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       let s = `${x},${y}`;
-      qTable[s] = { UP: 0, DOWN: 0, LEFT: 0, RIGHT: 0 };
+      qTable[s] = {};
+      const q = qTable[s];
+      if (x > 0) q['LEFT'] = 0;
+      if (y > 0) q['UP'] = 0;
+      if (x < COLS - 1) q['RIGHT'] = 0;
+      if (y < ROWS - 1) q['DOWN'] = 0;
     }
   }
 }
