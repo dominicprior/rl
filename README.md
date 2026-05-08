@@ -2,4 +2,4 @@
 
 (Still under construction)..
 
-You can see it running here: <https://dominicprior.github.io/docs/rldemo/>
+You can see it running here: <https://dominicprior.github.io/rl/>
