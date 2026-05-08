@@ -280,6 +280,10 @@ function initdom() {
   small.textContent =
     'Blue = Agent | Red = Cliff | Green = Goal | Yellow arrows = Policy';
 
+  const srctext = document.createElement('small');
+  srctext.innerHTML =
+    '<a href="https://github.com/dominicprior/rl/blob/main/src/main.ts">See on GitHub</a>';
+
   controls.appendChild(select);
   controls.appendChild(button);
   controls.appendChild(fastButton);
@@ -296,6 +300,7 @@ function initdom() {
   app.appendChild(heading);
   app.appendChild(controls);
   app.appendChild(canvas);
+  app.appendChild(srctext);
   return (canvas.getContext('2d') as CanvasRenderingContext2D);
 }
 
