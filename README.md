@@ -5,7 +5,7 @@
 You can see it running here: <https://dominicprior.github.io/rl/>
 
 Or you can run it locally by cloning this repo and typing vite (assuming you have installed
-[Vite](https://vite.dev/).
+[Vite](https://vite.dev/)).
 
 The original version came from asking Gemini this:
 
