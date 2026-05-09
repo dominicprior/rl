@@ -10,11 +10,12 @@ let gamma = 1;
 
 // Epsilon is the probability of exploring randomly, as opposed to greedily
 // choosing the action with the highest Q value.  An epsilon of zero means it
-// always chooses the highest, instead of exploring.  In this demo, the
-// inital Q values are high (by being zero rather than negative), which
+// always chooses the highest, instead of exploring, which means Q-Learning
+// and Sarsa are the same.  In this demo, the
+// initial Q values are high (by being zero rather than negative), which
 // makes the agent think every path is amazing until it tries it and is "disappointed."
 // This forces it to traverse almost every arc in the graph at least once
-// before it settles on a favorite.
+// before it settles on a favourite.
 let epsilon = 0;
 
 // The nudge factor for updating a Q value from a successor Q value.
@@ -152,7 +153,7 @@ async function loop() {
   }
 }
 
-// Make sure the q-values fit inside the tiles.
+// Make sure the q-values lines fit inside the tiles.
 function maybe_decrease_qValueScale(q: number, reward: number): void {
   if (-q > maxNegQValue && reward !== -100) {
     maxNegQValue = -q;
