@@ -4,8 +4,15 @@ const h = 240;
 let timeout = 100;
 let logging = false;
 
+// The discount factor for future rewards.  A value of 1 mean rewards
+// contribute equally to the overall return regardless of when they occur.
 let gamma = 1;
+
+// The probability of exploring randomly, as opposed to greedily choosing the
+// action with the highest Q value.
 let epsilon = 0;
+
+// The nudge factor for updating a Q value from a successor Q value.
 let alpha = 0.1;
 
 const ctx = initdom();
@@ -15,13 +22,15 @@ let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
 let state = { x: 0, y: 3 };
-let qTable: Record<string, Record<string, number> >;
+let qTable: Record<string, Record<string, number> >;  // e.g. qTable['0,0']['DOWN'] would be a Q value.
 resetQTable();
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let resetting = false;
-let history: Array<any> = []; // For Monte Carlo
+let history: Array<any> = []; // For Monte Carlo  // not working any more
 
+// The epsilon-greedy action ('UP', 'DOWN', 'LEFT' or 'RIGHT')
+// from the state, s (a string containing the x and y, e.g. '0,3').
 function action(s: string): string {
   if (Math.random() < epsilon) {
     const actions = Object.keys(qTable[s]);
@@ -32,24 +41,30 @@ function action(s: string): string {
   }
 }
 
+// The action with the highest Q value.
+// (In the event of a tie choose the first action).
 function highestAction(s: string): string {
   let ss = scores(s);
   let i = ss.indexOf(highestScore(s));  // 0, 1, 2 or 3
   return actions(s)[i];  // 'UP', 'DOWN', 'LEFT' or 'RIGHT'
 }
 
+// The highest Q value from the state, s.
 function highestScore(s: string): number {
   return Math.max(...scores(s));
 }
 
+// The possible actions from the state, s.
 function actions(s: string): Array<string> {
   return Object.keys(qTable[s]);
 }
 
+// The Q values from the state, s.
 function scores(s: string): Array<number> {
   return Object.values(qTable[s]);
 }
 
+// The result of taking action a from state s.
 function nextState(s: {x: number, y: number}, a: string) {
   let next = { x: s.x, y: s.y };
   if (a === 'UP') next.y = Math.max(0, s.y - 1);
@@ -79,14 +94,12 @@ async function loop() {
   while (true) {
     let { next, reward, done } = nextState(state, a);  // calc the next state
     let sNext = `${next.x},${next.y}`;
-    let aNext = action(sNext);  // calc what the action would be from that next state
-    let q = qTable[s][a];
+    let aNext = action(sNext);  // what the action would be from that next state
     
     if (algo !== 'montecarlo') {
-      let target = algo === 'qlearning' ?
-            reward + gamma * highestScore(sNext) :
-            reward + gamma * qTable[sNext][aNext];
-      qTable[s][a] += alpha * (target - q);
+      const q = algo === 'qlearning' ? highestScore(sNext) : qTable[sNext][aNext];
+      let target = reward + gamma * q;
+      qTable[s][a] += alpha * (target - qTable[s][a]);
       if (-qTable[s][a] > maxNegQValue && reward !== -100) {
         maxNegQValue = -qTable[s][a];
         if (maxNegQValue * qValueScale > 0.9 * TILE) {
@@ -121,7 +134,7 @@ async function loop() {
       resetting = false;
     }
     else if (done || steps > 500) {
-      if (algo === 'montecarlo') {
+      if (algo === 'montecarlo') {  // not working any more
         let G = 0;
         for (let i = history.length - 1; i >= 0; i--) {
           G = history[i].r + gamma * G;
@@ -237,7 +250,7 @@ function initdom() {
   const options = [
     { value: 'qlearning', label: 'Q-Learning (Off-policy)' },
     { value: 'sarsa', label: 'SARSA (On-policy)' },
-    { value: 'montecarlo', label: 'Monte Carlo (Every-visit)' },
+    // { value: 'montecarlo', label: 'Monte Carlo (Every-visit)' },  // not working any more
   ];
 
   for (const opt of options) {
