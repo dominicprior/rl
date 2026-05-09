@@ -1,3 +1,6 @@
+// A reinforcement learning demo on the cliff walking grid world.
+// You can see it in action here: https://dominicprior.github.io/rl/
+
 import './style.css'
 const w = 600;
 const h = 240;
