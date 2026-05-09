@@ -1,6 +1,21 @@
 // A reinforcement learning demo on the cliff walking grid world.
 // You can see it in action here: https://dominicprior.github.io/rl/
 
+// Still under construction...
+
+// Here are some future enhancements.
+//
+// - Pause and single-step buttons.
+// - A way to rewind the demo.
+// - Earlier arrows.
+// - Optional cliff.
+// - Fix Monte Carlo.
+// - Variable w and h.
+// - Variable gamma, epsilon and alpha.
+// - A graph of the episode lengths.
+// - Split the animation into moving the agent and updating Q.
+// - Add a delay for the cliff and the goal.
+
 import './style.css'
 const w = 600;
 const h = 240;
