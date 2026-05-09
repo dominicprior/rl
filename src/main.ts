@@ -100,13 +100,7 @@ async function loop() {
       const q = algo === 'qlearning' ? highestScore(sNext) : qTable[sNext][aNext];
       let target = reward + gamma * q;
       qTable[s][a] += alpha * (target - qTable[s][a]);
-      if (-qTable[s][a] > maxNegQValue && reward !== -100) {
-        maxNegQValue = -qTable[s][a];
-        if (maxNegQValue * qValueScale > 0.9 * TILE) {
-          qValueScale /= 2;
-        }
-      }
-
+      maybe_decrease_qValueScale(qTable[s][a], reward);
       log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qTable[s][a]);
       log(maxNegQValue);
     }
@@ -150,6 +144,16 @@ async function loop() {
       a = action(s);
     }
     await new Promise(r => setTimeout(r, timeout));
+  }
+}
+
+// Make sure the q-values fit inside the tiles.
+function maybe_decrease_qValueScale(q: number, reward: number): void {
+  if (-q > maxNegQValue && reward !== -100) {
+    maxNegQValue = -q;
+    if (maxNegQValue * qValueScale > 0.9 * TILE) {
+      qValueScale /= 2;
+    }
   }
 }
 
