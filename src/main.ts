@@ -200,16 +200,7 @@ function draw() {
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
 
-      if (qTable[s]) {
-        // Draw a policy arrow
-        const max = highestScore(s);    // e.g. -1.6
-        const bestA = highestAction(s);  // e.g. 2
-        ctx.fillStyle = "#f80";
-        ctx.font = "20px Arial";
-        const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
-        if (max !== 0) {
-            ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
-        }
+      drawArrow(ctx, s, x, y);
 
         // Draw the four q-values
         if (y !== 3 || x === 0) {
@@ -232,7 +223,7 @@ function draw() {
             ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
           }
         }
-      }
+      
     }
   }
   // Draw Agent
@@ -240,6 +231,18 @@ function draw() {
   ctx.beginPath();
   ctx.arc(state.x * TILE + TILE/2, state.y * TILE + TILE/2, 15, 0, Math.PI * 2);
   ctx.fill();
+}
+
+function drawArrow(ctx: CanvasRenderingContext2D, s: string, x: number, y: number) {
+  // Draw a policy arrow
+  const max = highestScore(s);    // e.g. -1.6
+  const bestA = highestAction(s);  // e.g. 2
+  ctx.fillStyle = "#f80";
+  ctx.font = "20px Arial";
+  const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
+  if (max !== 0) {
+      ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
+  }
 }
 
 function resetSim() {
