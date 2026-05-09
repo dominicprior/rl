@@ -180,7 +180,7 @@ function draw() {
         // Draw a policy arrow
         const max = highestScore(s);    // e.g. -1.6
         const bestA = highestAction(s);  // e.g. 2
-        ctx.fillStyle = "rgba(0, 0, 0, 1)";
+        ctx.fillStyle = "#f80";
         ctx.font = "20px Arial";
         const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
         if (max !== 0) {
@@ -295,7 +295,7 @@ function initdom() {
 
   const small = document.createElement('small');
   small.textContent =
-    'Blue = Agent | Red = Cliff | Green = Goal | Yellow arrows = Policy';
+    'Blue = Agent | Pink = Cliff | Green = Goal | Orange arrows = Policy | Black lines = Q values';
 
   const srctext = document.createElement('small');
   srctext.innerHTML =
