@@ -232,14 +232,19 @@ function draw() {
   ctx.fill();
 }
 
+// Draw an arrow unless the top two actions still have zero q values.
 function drawArrow(ctx: CanvasRenderingContext2D, s: string, x: number, y: number) {
-  // Draw a policy arrow
-  const max = highestScore(s);    // e.g. -1.6
-  const bestA = highestAction(s);  // e.g. 2
+  const q = qTable[s];  // e.g. { DOWN: 3, RIGHT: 4 }
+  // Find the indexes of the actions in the reverse order of their Q values.
+  const actions: Array<string> = Object.keys(q).toSorted(  // e.g. ['RIGHT', 'DOWN']
+    (a,b) => q[b] - q[a]
+  );
+
+  const bestA = actions[0];  // e.g. 'UP'
   ctx.fillStyle = "#f80";
   ctx.font = "20px Arial";
   const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
-  if (max !== 0) {
+  if (q[actions[1]] !== 0) {
       ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
   }
 }
