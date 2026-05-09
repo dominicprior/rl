@@ -202,28 +202,27 @@ function draw() {
 
       drawArrow(ctx, s, x, y);
 
-        // Draw the four q-values
-        if (y !== 3 || x === 0) {
-          ctx.fillStyle = '#000000';
-          const q = qTable[s];
-          if ('UP' in q) {
-            const ww = Math.min(-q['UP'] * qValueScale, TILE - 4);
-            ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
-          }
-          if ('DOWN' in q) {
-            const ww = Math.min(-q['DOWN'] * qValueScale, TILE - 4);
-            ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
-          }
-          if ('LEFT' in q) {
-            const hh = Math.min(-q['LEFT'] * qValueScale, TILE - 4);
-            ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
-          }
-          if ('RIGHT' in q) {
-            const hh = Math.min(-q['RIGHT'] * qValueScale, TILE - 4);
-            ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
-          }
+      // Draw the four q-values
+      if (y !== 3 || x === 0) {
+        ctx.fillStyle = '#000000';
+        const q = qTable[s];
+        if ('UP' in q) {
+          const ww = Math.min(-q['UP'] * qValueScale, TILE - 4);
+          ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
         }
-      
+        if ('DOWN' in q) {
+          const ww = Math.min(-q['DOWN'] * qValueScale, TILE - 4);
+          ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
+        }
+        if ('LEFT' in q) {
+          const hh = Math.min(-q['LEFT'] * qValueScale, TILE - 4);
+          ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
+        }
+        if ('RIGHT' in q) {
+          const hh = Math.min(-q['RIGHT'] * qValueScale, TILE - 4);
+          ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
+        }
+      }
     }
   }
   // Draw Agent
