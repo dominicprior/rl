@@ -4,12 +4,17 @@ const h = 240;
 let timeout = 100;
 let logging = false;
 
-// The discount factor for future rewards.  A value of 1 mean rewards
+// Gamma is the discount factor for future rewards.  A value of 1 mean rewards
 // contribute equally to the overall return regardless of when they occur.
 let gamma = 1;
 
-// The probability of exploring randomly, as opposed to greedily choosing the
-// action with the highest Q value.
+// Epsilon is the probability of exploring randomly, as opposed to greedily
+// choosing the action with the highest Q value.  An epsilon of zero means it
+// always chooses the highest, instead of exploring.  In this demo, the
+// inital Q values are high (by being zero rather than negative), which
+// makes the agent think every path is amazing until it tries it and is "disappointed."
+// This forces it to traverse almost every arc in the graph at least once
+// before it settles on a favorite.
 let epsilon = 0;
 
 // The nudge factor for updating a Q value from a successor Q value.
