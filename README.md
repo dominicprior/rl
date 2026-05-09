@@ -20,5 +20,5 @@ Here is Gemini's reply:
 > the agent must navigate from a start point to a goal while avoiding a "cliff"
 > that resets the agent and gives a heavy penalty.
 
-Here is the original [Gemini conversation](https://gemini.google.com/share/81b2d64e5c8d).
-
+Here is the original [Gemini conversation](https://gemini.google.com/share/81b2d64e5c8d),
+including the differences between Q-Learning and Sarsa.
