@@ -182,9 +182,9 @@ async function loop() {
     draw();
     if (resetting) {
       totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
+      resetQTable();
       state = [3, 0];  // row, col
       a = chooseAction(state);
-      resetQTable();
       resetting = false;
     }
     else if (done || steps > 5000) {
@@ -329,30 +329,10 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  const button = document.createElement('button');
-  button.textContent = 'Reset & Run';
-  button.addEventListener('click', () => {
-    resetSim();
-  });
-
-  const fastButton = document.createElement('button');
-  fastButton.textContent = 'Faster';
-  fastButton.addEventListener('click', () => {
-    timeout /= 2;
-  });
-
-  const slowButton = document.createElement('button');
-  slowButton.textContent = 'Slower';
-  slowButton.addEventListener('click', () => {
-    timeout *= 2;
-  });
-
-  const loggingButton = document.createElement('button');
-  loggingButton.textContent = 'Toggle logging';
-  loggingButton.addEventListener('click', () => {
-    logging = !logging;
-  });
-
+  addButton(controls, 'Reset & Run', resetSim);
+  addButton(controls, 'Faster', () => { timeout /= 2 });
+  addButton(controls, 'Slower', () => { timeout *= 2 });
+  addButton(controls, 'Toggle logging', () => { logging = !logging; });
   addButton(controls, 'Pause', pause);
 
   const stats = document.createElement('div');
@@ -369,10 +349,6 @@ function initdom() {
     '<a href="https://github.com/dominicprior/rl/blob/main/src/main.ts">See on GitHub</a>';
 
   controls.appendChild(select);
-  controls.appendChild(button);
-  controls.appendChild(fastButton);
-  controls.appendChild(slowButton);
-  controls.appendChild(loggingButton);
   controls.appendChild(stats);
   controls.appendChild(small);
 
