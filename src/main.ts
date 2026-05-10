@@ -65,7 +65,7 @@ function qValues(s: pair): Record<dir, number> {
 
 // The epsilon-greedy action ('UP', 'DOWN', 'LEFT' or 'RIGHT')
 // from the state, s (a string containing the x and y, e.g. '0,3').
-function action(s: pair): dir {
+function choose(s: pair): dir {
   if (Math.random() < epsilon) {
     const aa = actions(s);
     return aa[Math.floor(Math.random() * aa.length)];
@@ -126,11 +126,11 @@ function nextState(s: pair, a: dir) {
 
 async function loop() {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
-  let a = action(state);
+  let a = choose(state);
   
   while (true) {
     let { next, reward, done } = nextState(state, a);  // calc the next state
-    let aNext = action(next);  // what the action would be from that next state
+    let aNext = choose(next);  // what the action would be from that next state
     
       const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[aNext];
       let target = reward + gamma * q;
@@ -152,7 +152,7 @@ async function loop() {
     if (resetting) {
       totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
       state = [3, 0];  // row, col
-      a = action(state);
+      a = choose(state);
       resetQTable();
       resetting = false;
     }
@@ -161,7 +161,7 @@ async function loop() {
       steps = 0;
       totalReward = 0;
       state = [3, 0];
-      a = action(state);
+      a = choose(state);
     }
     await new Promise(r => setTimeout(r, timeout));
   }
