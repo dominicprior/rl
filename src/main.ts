@@ -46,17 +46,23 @@ let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
 type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
+type pair = [number, number];
 
-let state = { x: 0, y: 3 };
-let qTable: Record<string, Record<dir, number> >;  // e.g. qTable['0,0']['DOWN'] would be a Q value.
+let state = [3, 0] as pair;
+let qTable: Array<Array<Record<dir, number> > >;  // e.g. qTable[0][0]['DOWN'] would be a Q value.
 resetQTable();
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let resetting = false;
 
+// The q-values for state s.
+function qValues(s: pair): Record<dir, number> {
+  return qTable[s[0]][s[1]];
+}
+
 // The epsilon-greedy action ('UP', 'DOWN', 'LEFT' or 'RIGHT')
 // from the state, s (a string containing the x and y, e.g. '0,3').
-function action(s: string): dir {
+function action(s: pair): dir {
   if (Math.random() < epsilon) {
     const aa = actions(s);
     return aa[Math.floor(Math.random() * aa.length)];
@@ -68,68 +74,69 @@ function action(s: string): dir {
 
 // The action with the highest Q value.
 // (In the event of a tie choose the first action).
-function highestAction(s: string): dir {
+function highestAction(s: pair): dir {
   let ss = scores(s);
   let i = ss.indexOf(highestScore(s));  // 0, 1, 2 or 3
   return actions(s)[i];  // 'UP', 'DOWN', 'LEFT' or 'RIGHT'
 }
 
 // The highest Q value from the state, s.
-function highestScore(s: string): number {
+function highestScore(s: pair): number {
   return Math.max(...scores(s));
 }
 
 // The possible actions from the state, s.
-function actions(s: string): Array<dir> {
-  return Object.keys(qTable[s]) as Array<dir>;
+function actions(s: pair): Array<dir> {
+  return Object.keys(qValues(s)) as Array<dir>;
 }
 
 // The Q values from the state, s.
-function scores(s: string): Array<number> {
-  return Object.values(qTable[s]);
+function scores(s: pair): Array<number> {
+  return Object.values(qValues(s));
 }
 
 // The result of taking action a from state s.
-function nextState(s: {x: number, y: number}, a: string) {
-  let next = { x: s.x, y: s.y };
-  if (a === 'UP') next.y = Math.max(0, s.y - 1);
-  if (a === 'DOWN') next.y = Math.min(ROWS - 1, s.y + 1);
-  if (a === 'LEFT') next.x = Math.max(0, s.x - 1);
-  if (a === 'RIGHT') next.x = Math.min(COLS - 1, s.x + 1);
+function nextState(s: pair, a: dir) {
+  let y = s[0];
+  let x = s[1];
+  if (a === 'UP')    y--;
+  if (a === 'DOWN')  y++;
+  if (a === 'LEFT')  x--;
+  if (a === 'RIGHT') x++;
   
   let reward = -1;
   let done = false;
 
   // The Cliff
-  if (next.y === 3 && next.x > 0 && next.x < COLS - 1) {
+  if (y === 3 && x > 0 && x < COLS - 1) {
     reward = -100;
-    next = { x: 0, y: 3 }; // Back to start
-  } else if (next.x === COLS - 1 && next.y === 3) {
+    y = 3; // Back to start
+    x = 0;
+  }
+  else if (x === COLS - 1 && y === 3) {
     reward = 0;
     done = true;
   }
+  const next = [y, x] as pair;
   return { next, reward, done };
 }
 
 async function loop() {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
-  let s = `${state.x},${state.y}`;
-  let a = action(s);
+  let a = action(state);
   
   while (true) {
     let { next, reward, done } = nextState(state, a);  // calc the next state
-    let sNext = `${next.x},${next.y}`;
-    let aNext = action(sNext);  // what the action would be from that next state
+    let aNext = action(next);  // what the action would be from that next state
     
-      const q = algo === 'qlearning' ? highestScore(sNext) : qTable[sNext][aNext];
+      const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[aNext];
       let target = reward + gamma * q;
-      qTable[s][a] += alpha * (target - qTable[s][a]);
-      maybe_decrease_qValueScale(qTable[s][a], reward);
-      log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qTable[s][a]);
+      qValues(state)[a] += alpha * (target - qValues(state)[a]);
+      maybe_decrease_qValueScale(qValues(state)[a], reward);
+      log(state, a, ' ', next, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(state)[a]);
       log(maxNegQValue);
 
     state = next;
-    s = sNext;
     a = aNext;
     steps++;
     totalSteps++;
@@ -141,9 +148,8 @@ async function loop() {
 
     if (resetting) {
       totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
-      state = { x: 0, y: 3 };
-      s = '0,3';
-      a = action(s);
+      state = [3, 0];
+      a = action(state);
       resetQTable();
       resetting = false;
     }
@@ -151,9 +157,8 @@ async function loop() {
       episode++;
       steps = 0;
       totalReward = 0;
-      state = { x: 0, y: 3 };
-      s = `0,3`;
-      a = action(s);
+      state = [3, 0];
+      a = action(state);
     }
     await new Promise(r => setTimeout(r, timeout));
   }
@@ -173,7 +178,7 @@ function draw() {
   ctx.clearRect(0, 0, w, h);
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
-      let s = `${x},${y}`;
+      let s = [y, x] as pair;
       ctx.strokeStyle = '#ccc';
       ctx.strokeRect(x * TILE, y * TILE, TILE, TILE);
       
@@ -188,12 +193,12 @@ function draw() {
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
 
-      drawArrow(ctx, s, x, y);
+      drawArrow(ctx, s);
 
       // Draw the four q-values
       if (y !== 3 || x === 0) {
         ctx.fillStyle = '#000000';
-        const q = qTable[s];
+        const q = qValues(s);
         if ('UP' in q) {
           const ww = Math.min(-q['UP'] * qValueScale, TILE - 4);
           ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
@@ -216,13 +221,14 @@ function draw() {
   // Draw Agent
   ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
   ctx.beginPath();
-  ctx.arc(state.x * TILE + TILE/2, state.y * TILE + TILE/2, 15, 0, Math.PI * 2);
+  ctx.arc(state[1] * TILE + TILE/2, state[0] * TILE + TILE/2, 15, 0, Math.PI * 2);
   ctx.fill();
 }
 
 // Draw an arrow unless the top two actions still have zero q values.
-function drawArrow(ctx: CanvasRenderingContext2D, s: string, x: number, y: number) {
-  const q = qTable[s];  // e.g. { DOWN: 3, RIGHT: 4 }
+function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
+  const y = s[0], x = s[1];
+  const q = qValues(s);  // e.g. { DOWN: 3, RIGHT: 4 }
   // Find the indexes of the actions in the reverse order of their Q values.
   const aa: Array<dir> = actions(s).toSorted(  // e.g. ['RIGHT', 'DOWN']
     (a,b) => q[b] - q[a]
@@ -246,12 +252,12 @@ function resetSim() {
 }
 
 function resetQTable() {
-  qTable = {};
+  qTable = [];
   for (let y = 0; y < ROWS; y++) {
+    qTable.push([]);
     for (let x = 0; x < COLS; x++) {
-      let s = `${x},${y}`;
-      qTable[s] = {} as Record<dir, number>;
-      const q = qTable[s];
+      qTable[y].push({} as Record<dir, number>);
+      const q = qTable[y][x];
       if (x > 0) q['LEFT'] = 0;
       if (y > 0) q['UP'] = 0;
       if (x < COLS - 1) q['RIGHT'] = 0;
