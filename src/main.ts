@@ -7,9 +7,7 @@
 //
 // - Pause and single-step buttons.
 // - A way to rewind the demo.
-// - Earlier arrows.
 // - Optional cliff.
-// - Fix Monte Carlo.
 // - Variable w and h.
 // - Variable gamma, epsilon and alpha.
 // - A graph of the episode lengths.
@@ -48,12 +46,14 @@ let maxNegQValue = 0; // apart from ones bordering the cliff
 type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
 type pair = [number, number];
 
-let state = [3, 0] as pair;  // y first, i.e. row first
 // The qTable is an array of rows.
 // Each row is an array of mappings from direction to q-value.
 // i.e. y first again.
 let qTable: Array<Array<Record<dir, number> > >;  // e.g. qTable[0][0]['DOWN'] would be a Q value.
 resetQTable();
+
+let state: pair = [3, 0];  // y first, i.e. row first
+let action = chooseAction(state);
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let resetting = false;
@@ -99,7 +99,7 @@ function scores(s: pair): Array<number> {
 }
 
 // The result of taking action a from state s.
-function nextState(s: pair, a: dir) {
+function calcNextState(s: pair, a: dir) {
   let y = s[0];
   let x = s[1];
   if (a === 'UP')    y--;
@@ -120,24 +120,26 @@ function nextState(s: pair, a: dir) {
     reward = 0;
     done = true;
   }
-  const next = [y, x] as pair;
-  return { next, reward, done };
+  const nextState = [y, x] as pair;
+  return { nextState, reward, done };
 }
 
-function updateQ(s: pair, a: dir, algo: string, next: pair, aNext: dir, reward: number): void {
-  const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[aNext];
+function updateQ(s: pair, a: dir, algo: string, next: pair, nextAction: dir, reward: number): void {
+  const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
   let target = reward + gamma * q;
   qValues(s)[a] += alpha * (target - qValues(s)[a]);
   maybe_decrease_qValueScale(qValues(s)[a], reward);
-  log(s, a, ' ', next, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(s)[a]);
+  log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(s)[a]);
   log(maxNegQValue);
 }
 
-function step(s: pair, a: dir, algo: string): [pair, dir, number, boolean] {
-  let { next, reward, done } = nextState(state, a);
-  let aNext = chooseAction(next);
-  updateQ(s, a, algo, next, aNext, reward);
-  return [next, aNext, reward, done];
+function step(algo: string): [number, boolean] {
+  let { nextState, reward, done } = calcNextState(state, action);
+  let nextAction = chooseAction(nextState);
+  updateQ(state, action, algo, nextState, nextAction, reward);
+  state = nextState;
+  action = nextAction;
+  return [reward, done];
 }
 
 async function loop() {
@@ -147,7 +149,7 @@ async function loop() {
   while (true) {
     let reward: number;
     let done: Boolean;
-    [state, a, reward, done] = step(state, a, algo);
+    [reward, done] = step(algo);
     steps++;
     totalSteps++;
     totalReward += reward;
