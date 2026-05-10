@@ -127,9 +127,9 @@ function nextState(s: pair, a: dir) {
 function updateQ(s: pair, a: dir, algo: string, next: pair, aNext: dir, reward: number): void {
   const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[aNext];
   let target = reward + gamma * q;
-  qValues(state)[a] += alpha * (target - qValues(state)[a]);
-  maybe_decrease_qValueScale(qValues(state)[a], reward);
-  log(state, a, ' ', next, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(state)[a]);
+  qValues(s)[a] += alpha * (target - qValues(s)[a]);
+  maybe_decrease_qValueScale(qValues(s)[a], reward);
+  log(s, a, ' ', next, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(s)[a]);
   log(maxNegQValue);
 }
 
@@ -145,9 +145,9 @@ async function loop() {
   let a = choose(state);
 
   while (true) {
-    let [next, aNext, reward, done] = step(state, a, algo);
-    state = next;
-    a = aNext;
+    let reward: number;
+    let done; Boolean;
+    [state, a, reward, done] = step(state, a, algo);
     steps++;
     totalSteps++;
     totalReward += reward;
