@@ -146,7 +146,7 @@ async function loop() {
 
   while (true) {
     let reward: number;
-    let done; Boolean;
+    let done: Boolean;
     [state, a, reward, done] = step(state, a, algo);
     steps++;
     totalSteps++;
