@@ -55,6 +55,8 @@ resetQTable();
 let state: pair = [3, 0];  // y first, i.e. row first
 let action = chooseAction(state);
 
+let timeoutId: number | null = null;
+
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let resetting = false;
 
@@ -142,6 +144,28 @@ function step(algo: string): [number, boolean] {
   return [reward, done];
 }
 
+function scheduleNext() {
+  timeoutId = setTimeout(() => {
+    step();
+    scheduleNext();
+  }, timeout);
+}
+
+function pause() {
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId);
+    timeoutId = null;
+  }
+}
+
+function resume() {
+  if (timeoutId === null) scheduleNext();
+}
+
+function singleStep() {
+  pause();
+  step();
+}
 async function loop() {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   let a = chooseAction(state);
