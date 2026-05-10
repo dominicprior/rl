@@ -156,7 +156,7 @@ async function loop() {
       resetQTable();
       resetting = false;
     }
-    else if (done || steps > 500) {  // ??? the 500 never seems to trigger
+    else if (done || steps > 5000) {  // ??? the 500 never seems to trigger
       episode++;
       steps = 0;
       totalReward = 0;
