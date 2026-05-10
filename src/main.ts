@@ -328,6 +328,8 @@ function initdom() {
     logging = !logging;
   });
 
+  addButton(controls, 'Pause', pause);
+
   const stats = document.createElement('div');
   stats.className = 'stats';
   stats.id = 'stats';
@@ -359,6 +361,13 @@ function initdom() {
   app.appendChild(canvas);
   app.appendChild(srctext);
   return (canvas.getContext('2d') as CanvasRenderingContext2D);
+}
+
+function addButton(controls: HTMLDivElement, text: string, f: () => void) {
+  const b = document.createElement('button');
+  b.textContent = text;
+  b.addEventListener('click', f);
+  controls.appendChild(b);
 }
 
 function log(...args: any[]): void {
