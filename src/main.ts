@@ -153,9 +153,6 @@ async function loop() {
     totalReward += reward;
 
     draw();
-    (document.getElementById('stats') as HTMLDivElement).innerText =
-      `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
-
     if (resetting) {
       totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
       state = [3, 0];  // row, col
@@ -233,6 +230,9 @@ function draw() {
   ctx.beginPath();
   ctx.arc(state[1] * TILE + TILE/2, state[0] * TILE + TILE/2, 15, 0, Math.PI * 2);
   ctx.fill();
+  // Write stats
+  (document.getElementById('stats') as HTMLDivElement).innerText =
+      `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
 }
 
 // Draw an arrow unless the top two actions still have zero q values.
