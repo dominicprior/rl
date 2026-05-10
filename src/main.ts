@@ -65,7 +65,7 @@ function qValues(s: pair): Record<dir, number> {
 
 // The epsilon-greedy action ('UP', 'DOWN', 'LEFT' or 'RIGHT')
 // from the state, s (a string containing the x and y, e.g. '0,3').
-function choose(s: pair): dir {
+function chooseAction(s: pair): dir {
   if (Math.random() < epsilon) {
     const aa = actions(s);
     return aa[Math.floor(Math.random() * aa.length)];
@@ -134,15 +134,15 @@ function updateQ(s: pair, a: dir, algo: string, next: pair, aNext: dir, reward: 
 }
 
 function step(s: pair, a: dir, algo: string): [pair, dir, number, boolean] {
-  let { next, reward, done } = nextState(state, a);  // Calc the next state...
-  let aNext = choose(next);  // ...and choose what the action would be from that next state.
+  let { next, reward, done } = nextState(state, a);
+  let aNext = chooseAction(next);
   updateQ(s, a, algo, next, aNext, reward);
   return [next, aNext, reward, done];
 }
 
 async function loop() {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
-  let a = choose(state);
+  let a = chooseAction(state);
 
   while (true) {
     let reward: number;
@@ -156,7 +156,7 @@ async function loop() {
     if (resetting) {
       totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
       state = [3, 0];  // row, col
-      a = choose(state);
+      a = chooseAction(state);
       resetQTable();
       resetting = false;
     }
@@ -165,7 +165,7 @@ async function loop() {
       steps = 0;
       totalReward = 0;
       state = [3, 0];
-      a = choose(state);
+      a = chooseAction(state);
     }
     await new Promise(r => setTimeout(r, timeout));
   }
