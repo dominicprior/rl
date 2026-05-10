@@ -48,14 +48,17 @@ let maxNegQValue = 0; // apart from ones bordering the cliff
 type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
 type pair = [number, number];
 
-let state = [3, 0] as pair;
+let state = [3, 0] as pair;  // y first, i.e. row first
+// The qTable is an array of rows.
+// Each row is an array of mappings from direction to q-value.
+// i.e. y first again.
 let qTable: Array<Array<Record<dir, number> > >;  // e.g. qTable[0][0]['DOWN'] would be a Q value.
 resetQTable();
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let resetting = false;
 
-// The q-values for state s.
+// The q-values for state s.  The pair is the y then the x.
 function qValues(s: pair): Record<dir, number> {
   return qTable[s[0]][s[1]];
 }
@@ -148,12 +151,12 @@ async function loop() {
 
     if (resetting) {
       totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
-      state = [3, 0];
+      state = [3, 0];  // row, col
       a = action(state);
       resetQTable();
       resetting = false;
     }
-    else if (done || steps > 500) {
+    else if (done || steps > 500) {  // ??? the 500 never seems to trigger
       episode++;
       steps = 0;
       totalReward = 0;
