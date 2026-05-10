@@ -126,7 +126,8 @@ function calcNextState(s: pair, a: dir) {
   return { nextState, reward, done };
 }
 
-function updateQ(s: pair, a: dir, algo: string, next: pair, nextAction: dir, reward: number): void {
+function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): void {
+  let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
   let target = reward + gamma * q;
   qValues(s)[a] += alpha * (target - qValues(s)[a]);
@@ -135,12 +136,13 @@ function updateQ(s: pair, a: dir, algo: string, next: pair, nextAction: dir, rew
   log(maxNegQValue);
 }
 
-function step(algo: string): [number, boolean] {
+function step(): [number, boolean] {
   let { nextState, reward, done } = calcNextState(state, action);
   let nextAction = chooseAction(nextState);
-  updateQ(state, action, algo, nextState, nextAction, reward);
+  updateQ(state, action, nextState, nextAction, reward);
   state = nextState;
   action = nextAction;
+  draw();
   return [reward, done];
 }
 
@@ -167,13 +169,12 @@ function singleStep() {
   step();
 }
 async function loop() {
-  let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   let a = chooseAction(state);
 
   while (true) {
     let reward: number;
     let done: Boolean;
-    [reward, done] = step(algo);
+    [reward, done] = step();
     steps++;
     totalSteps++;
     totalReward += reward;
