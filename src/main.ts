@@ -124,21 +124,28 @@ function nextState(s: pair, a: dir) {
   return { next, reward, done };
 }
 
+function updateQ(s: pair, a: dir, algo: string, next: pair, aNext: dir, reward: number): void {
+  const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[aNext];
+  let target = reward + gamma * q;
+  qValues(state)[a] += alpha * (target - qValues(state)[a]);
+  maybe_decrease_qValueScale(qValues(state)[a], reward);
+  log(state, a, ' ', next, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(state)[a]);
+  log(maxNegQValue);
+}
+
+function step(s: pair, a: dir, algo: string): [pair, dir, number, boolean] {
+  let { next, reward, done } = nextState(state, a);  // Calc the next state...
+  let aNext = choose(next);  // ...and choose what the action would be from that next state.
+  updateQ(s, a, algo, next, aNext, reward);
+  return [next, aNext, reward, done];
+}
+
 async function loop() {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   let a = choose(state);
-  
-  while (true) {
-    let { next, reward, done } = nextState(state, a);  // calc the next state
-    let aNext = choose(next);  // what the action would be from that next state
-    
-      const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[aNext];
-      let target = reward + gamma * q;
-      qValues(state)[a] += alpha * (target - qValues(state)[a]);
-      maybe_decrease_qValueScale(qValues(state)[a], reward);
-      log(state, a, ' ', next, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(state)[a]);
-      log(maxNegQValue);
 
+  while (true) {
+    let [next, aNext, reward, done] = step(state, a, algo);
     state = next;
     a = aNext;
     steps++;
