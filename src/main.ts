@@ -45,20 +45,21 @@ const ROWS = 4, COLS = 10, TILE = 60;
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
+type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
+
 let state = { x: 0, y: 3 };
-let qTable: Record<string, Record<string, number> >;  // e.g. qTable['0,0']['DOWN'] would be a Q value.
+let qTable: Record<string, Record<dir, number> >;  // e.g. qTable['0,0']['DOWN'] would be a Q value.
 resetQTable();
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let resetting = false;
-let history: Array<any> = []; // For Monte Carlo  // not working any more
 
 // The epsilon-greedy action ('UP', 'DOWN', 'LEFT' or 'RIGHT')
 // from the state, s (a string containing the x and y, e.g. '0,3').
-function action(s: string): string {
+function action(s: string): dir {
   if (Math.random() < epsilon) {
-    const actions = Object.keys(qTable[s]);
-    return actions[Math.floor(Math.random() * actions.length)];
+    const aa = actions(s);
+    return aa[Math.floor(Math.random() * aa.length)];
   }
   else {
     return highestAction(s);
@@ -67,7 +68,7 @@ function action(s: string): string {
 
 // The action with the highest Q value.
 // (In the event of a tie choose the first action).
-function highestAction(s: string): string {
+function highestAction(s: string): dir {
   let ss = scores(s);
   let i = ss.indexOf(highestScore(s));  // 0, 1, 2 or 3
   return actions(s)[i];  // 'UP', 'DOWN', 'LEFT' or 'RIGHT'
@@ -79,8 +80,8 @@ function highestScore(s: string): number {
 }
 
 // The possible actions from the state, s.
-function actions(s: string): Array<string> {
-  return Object.keys(qTable[s]);
+function actions(s: string): Array<dir> {
+  return Object.keys(qTable[s]) as Array<dir>;
 }
 
 // The Q values from the state, s.
@@ -120,17 +121,12 @@ async function loop() {
     let sNext = `${next.x},${next.y}`;
     let aNext = action(sNext);  // what the action would be from that next state
     
-    if (algo !== 'montecarlo') {
       const q = algo === 'qlearning' ? highestScore(sNext) : qTable[sNext][aNext];
       let target = reward + gamma * q;
       qTable[s][a] += alpha * (target - qTable[s][a]);
       maybe_decrease_qValueScale(qTable[s][a], reward);
       log(s, a, ' ', sNext, aNext, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qTable[s][a]);
       log(maxNegQValue);
-    }
-    else {
-      history.push({ s, a, r: reward });
-    }
 
     state = next;
     s = sNext;
@@ -152,14 +148,6 @@ async function loop() {
       resetting = false;
     }
     else if (done || steps > 500) {
-      if (algo === 'montecarlo') {  // not working any more
-        let G = 0;
-        for (let i = history.length - 1; i >= 0; i--) {
-          G = history[i].r + gamma * G;
-          qTable[history[i].s][history[i].a] += 0.05 * (G - qTable[history[i].s][history[i].a]);
-        }
-        history = [];
-      }
       episode++;
       steps = 0;
       totalReward = 0;
@@ -236,17 +224,21 @@ function draw() {
 function drawArrow(ctx: CanvasRenderingContext2D, s: string, x: number, y: number) {
   const q = qTable[s];  // e.g. { DOWN: 3, RIGHT: 4 }
   // Find the indexes of the actions in the reverse order of their Q values.
-  const actions: Array<string> = Object.keys(q).toSorted(  // e.g. ['RIGHT', 'DOWN']
+  const aa: Array<dir> = actions(s).toSorted(  // e.g. ['RIGHT', 'DOWN']
     (a,b) => q[b] - q[a]
   );
 
-  const bestA = actions[0];  // e.g. 'UP'
+  const bestA = aa[0];  // e.g. 'UP'
   ctx.fillStyle = "#f80";
   ctx.font = "20px Arial";
-  const arrow = ({ UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[bestA] as string);
-  if (q[actions[1]] !== 0) {
-      ctx.fillText(arrow, x * TILE + 22, y * TILE + 35);
+  const str = arrowStr(bestA);
+  if (q[aa[1]] !== 0) {
+      ctx.fillText(str, x * TILE + 22, y * TILE + 35);
   }
+}
+
+function arrowStr(dir: dir): string {
+  return { UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[dir];
 }
 
 function resetSim() {
@@ -258,7 +250,7 @@ function resetQTable() {
   for (let y = 0; y < ROWS; y++) {
     for (let x = 0; x < COLS; x++) {
       let s = `${x},${y}`;
-      qTable[s] = {};
+      qTable[s] = {} as Record<dir, number>;
       const q = qTable[s];
       if (x > 0) q['LEFT'] = 0;
       if (y > 0) q['UP'] = 0;
@@ -285,7 +277,6 @@ function initdom() {
   const options = [
     { value: 'qlearning', label: 'Q-Learning (Off-policy)' },
     { value: 'sarsa', label: 'SARSA (On-policy)' },
-    // { value: 'montecarlo', label: 'Monte Carlo (Every-visit)' },  // not working any more
   ];
 
   for (const opt of options) {
