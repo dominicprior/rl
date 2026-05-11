@@ -46,7 +46,8 @@ let alpha = 0.1;
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
-const INIT_Y = 3, INIT_X = 0;
+const INIT_Y = 1, INIT_X = 4;
+const GOAL_Y = ROWS - 1, GOAL_X = COLS - 1;
 
 // The qTable is an array of rows.
 // Each row is an array of cells.
@@ -64,6 +65,18 @@ let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 let history: Array<historyItem>;
 
 const ctx = initdom();
+
+function isCliff(pair: pair): boolean {
+  const y = pair[0];
+  const x = pair[1];
+  return y === ROWS - 1 && x > 0 && x < COLS - 1;
+}
+
+function isGoal(pair: pair): boolean {
+  const y = pair[0];
+  const x = pair[1];
+  return y === GOAL_Y && x === GOAL_X;
+}
 
 function resetGlobals(): void {
   history = [];
@@ -121,23 +134,22 @@ function calcNextState(s: pair, a: dir) {
   if (a === 'DOWN')  y++;
   if (a === 'LEFT')  x--;
   if (a === 'RIGHT') x++;
-  
+
   let reward = -1;
   let done = false;
 
-  // The Cliff
-  if (y === 3 && x > 0 && x < COLS - 1) {
+  if (isCliff([y, x])) {
     reward = -100;
-    y = 3; // Back to start
-    x = 0;
+    y = INIT_Y;
+    x = INIT_X;
   }
-  else if (x === COLS - 1 && y === 3) {
+  else if (isGoal([y, x])) {
     reward = 0;
     episode++;
     steps = 0;
     totalReward = 0;
-    y = 3; // Back to start
-    x = 0;
+    y = INIT_Y;
+    x = INIT_X;
     done = true;
   }
   const nextState = [y, x] as pair;
@@ -228,14 +240,13 @@ function draw() {
       let s = [y, x] as pair;
       ctx.strokeStyle = '#ccc';
       ctx.strokeRect(x * TILE, y * TILE, TILE, TILE);
-      
-      // Draw Cliff
-      if (y === 3 && x > 0 && x < COLS - 1) {
+
+      if (isCliff(s)) {
         ctx.fillStyle = '#ffcccc';
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
-      // Draw Goal
-      if (y === 3 && x === COLS - 1) {
+
+      if (isGoal(s)) {
         ctx.fillStyle = '#ccffcc';
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
@@ -243,7 +254,7 @@ function draw() {
       drawArrow(ctx, s);
 
       // Draw the four q-values
-      if (y !== 3 || x === 0) {
+      if (!isCliff(s) && !isGoal(s)) {
         ctx.fillStyle = '#000000';
         const q = qValues(s);
         if ('UP' in q) {
