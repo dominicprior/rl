@@ -18,10 +18,10 @@ type pair = [number, number];  // for storing a state
 type historyItem = [ pair, dir, number,     // state, action, Q value
           number, number, number, number ]; // stats
 
-const w = 600;
-const h = 240;
 const ROWS = 4, COLS = 10;
 const TILE = 60;  // tile size
+const w = COLS * TILE;
+const h = ROWS * TILE;
 
 let timeout = 100;
 let logging = false;
