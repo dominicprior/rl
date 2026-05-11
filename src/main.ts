@@ -279,7 +279,7 @@ function draw() {
   // Draw Agent
   ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
   ctx.beginPath();
-  ctx.arc(state[1] * TILE + TILE/2, state[0] * TILE + TILE/2, 15, 0, Math.PI * 2);
+  ctx.arc(state[1] * TILE + TILE/2, state[0] * TILE + TILE/2, TILE/4, 0, Math.PI * 2);
   ctx.fill();
   // Write stats
   (document.getElementById('stats') as HTMLDivElement).innerText =
@@ -295,7 +295,8 @@ function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
   );
 
   const bestA = aa[0];  // e.g. 'UP'
-  ctx.font = "20px Arial";
+  ctx.font = `${TILE/3}px Arial`;
+  // ctx.font = "20px Arial";
   const str = arrowStr(bestA);
   if (q[aa[1]] === 0) {
     ctx.fillStyle = "#ddd";  // if still a tie
@@ -303,7 +304,9 @@ function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
   else {
     ctx.fillStyle = "#f80";  // if a definite choice
   }
-  ctx.fillText(str, x * TILE + 22, y * TILE + 35);
+  const isThin = bestA === 'UP' || bestA === 'DOWN';
+  ctx.fillText(str, (x + (isThin ? 0.42 : 0.35)) * TILE,
+        (y + 0.59) * TILE);
 }
 
 function arrowStr(dir: dir): string {
