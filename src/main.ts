@@ -58,6 +58,10 @@ let timeoutId: number | null = null;
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 
+type historyItem = [ pair, dir, number ];
+
+let history: Array<historyItem> = [];
+
 // The q-values for state s.  The pair is the y then the x.
 function qValues(s: pair): Record<dir, number> {
   return qTable[s[0]][s[1]];
@@ -144,6 +148,7 @@ function step(): void {
   let { nextState, reward, done } = calcNextState(state, action);
   totalReward += reward;
   let nextAction = chooseAction(nextState);
+  history.push([[state[0], state[1]], action, qValues(state)[action]]);
   updateQ(state, action, nextState, nextAction, reward, done);
   state = nextState;
   action = nextAction;
@@ -172,6 +177,17 @@ function resume() {
 function singleStep() {
   pause();
   step();
+}
+
+function back() {
+  pause();
+  if (history.length !== 0) {
+    const h = history.pop() as historyItem;
+    state = h[0];
+    action = h[1];
+    qValues(state)[action] = h[2];
+    draw();
+  }
 }
 
 // Make sure the q-values lines fit inside the tiles.
@@ -311,6 +327,7 @@ function initdom() {
   addButton(controls, 'Pause', pause);
   addButton(controls, 'Resume', resume);
   addButton(controls, 'Step', singleStep);
+  addButton(controls, 'Back', back);
 
   const stats = document.createElement('div');
   stats.className = 'stats';
