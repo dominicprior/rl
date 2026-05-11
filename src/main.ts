@@ -57,7 +57,6 @@ let action = chooseAction(state);
 let timeoutId: number | null = null;
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
-let resetting = false;
 
 // The q-values for state s.  The pair is the y then the x.
 function qValues(s: pair): Record<dir, number> {
@@ -264,10 +263,6 @@ function arrowStr(dir: dir): string {
   return { UP: '↑', DOWN: '↓', LEFT: '←', RIGHT: '→' }[dir];
 }
 
-function resetSim() {
-  resetting = true;
-}
-
 function resetQTable() {
   qTable = [];
   for (let y = 0; y < ROWS; y++) {
@@ -309,7 +304,7 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  addButton(controls, 'Reset & Run', resetSim);
+  // addButton(controls, 'Reset', () => {});
   addButton(controls, 'Faster', () => { timeout /= 2 });
   addButton(controls, 'Slower', () => { timeout *= 2 });
   addButton(controls, 'Toggle logging', () => { logging = !logging; });
