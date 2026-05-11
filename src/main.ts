@@ -147,6 +147,8 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
 function step(): void {
   let { nextState, reward, done } = calcNextState(state, action);
   totalReward += reward;
+  totalSteps++;
+  steps++;
   let nextAction = chooseAction(nextState);
   history.push([[state[0], state[1]], action, qValues(state)[action]]);
   updateQ(state, action, nextState, nextAction, reward, done);
