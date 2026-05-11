@@ -175,18 +175,6 @@ function singleStep() {
   pause();
   step();
 }
-async function loop() {
-
-  while (true) {
-    step();
-    steps++;
-    totalSteps++;
-
-    draw();
-
-    await new Promise(r => setTimeout(r, timeout));
-  }
-}
 
 // Make sure the q-values lines fit inside the tiles.
 function maybe_decrease_qValueScale(q: number, reward: number): void {
@@ -367,6 +355,4 @@ function log(...args: any[]): void {
   }
 }
 
-draw();
-await new Promise(r => setTimeout(r, timeout));
-loop();
+scheduleNext();
