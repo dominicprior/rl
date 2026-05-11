@@ -136,14 +136,15 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): 
   log(maxNegQValue);
 }
 
-function step(): [number, boolean] {
+function step(): boolean {
   let { nextState, reward, done } = calcNextState(state, action);
+  totalReward += reward;
   let nextAction = chooseAction(nextState);
   updateQ(state, action, nextState, nextAction, reward);
   state = nextState;
   action = nextAction;
   draw();
-  return [reward, done];
+  return done;
 }
 
 function scheduleNext() {
@@ -174,10 +175,9 @@ async function loop() {
   while (true) {
     let reward: number;
     let done: Boolean;
-    [reward, done] = step();
+    done = step();
     steps++;
     totalSteps++;
-    totalReward += reward;
 
     draw();
     if (resetting) {
