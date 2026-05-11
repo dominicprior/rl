@@ -6,7 +6,6 @@
 // Here are some future enhancements.
 //
 // - Optional cliff.
-// - Variable w and h.
 // - Variable gamma, epsilon and alpha.
 // - A graph of the episode lengths.
 // - Split the animation into moving the agent and updating Q.
@@ -22,6 +21,7 @@ const ROWS = 4, COLS = 10;
 const TILE = 60;  // tile size
 const w = COLS * TILE;
 const h = ROWS * TILE;
+const thereIsACliff = true;
 
 let timeout = 100;
 let logging = false;
@@ -69,7 +69,7 @@ const ctx = initdom();
 function isCliff(pair: pair): boolean {
   const y = pair[0];
   const x = pair[1];
-  return y === ROWS - 1 && x > 0 && x < COLS - 1;
+  return thereIsACliff && (y === ROWS - 1 && x > 0 && x < COLS - 1);
 }
 
 function isGoal(pair: pair): boolean {
