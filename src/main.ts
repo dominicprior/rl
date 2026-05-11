@@ -46,6 +46,8 @@ let alpha = 0.1;
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
+const INIT_Y = 3, INIT_X = 0;
+
 // The qTable is an array of rows.
 // Each row is an array of cells.
 // Each cell is a mapping from direction to q-value.
@@ -67,7 +69,7 @@ function resetGlobals(): void {
   history = [];
   totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
   resetQTable();
-  state = [3, 0];  // y first, i.e. row first
+  state = [INIT_Y, INIT_X];
   action = chooseAction(state);
 }
 
@@ -175,6 +177,12 @@ function scheduleNext() {
   }, timeout);
 }
 
+function reset() {
+  pause();
+  resetGlobals();
+  draw();
+}
+
 function pause() {
   if (timeoutId !== null) {
     clearTimeout(timeoutId);
@@ -267,7 +275,6 @@ function draw() {
       `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
 }
 
-// Draw an arrow unless the top two actions still have zero q values.
 function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
   const y = s[0], x = s[1];
   const q = qValues(s);  // e.g. { DOWN: 3, RIGHT: 4 }
@@ -280,10 +287,10 @@ function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
   ctx.font = "20px Arial";
   const str = arrowStr(bestA);
   if (q[aa[1]] === 0) {
-    ctx.fillStyle = "#ddd";
+    ctx.fillStyle = "#ddd";  // if still a tie
   }
   else {
-    ctx.fillStyle = "#f80";
+    ctx.fillStyle = "#f80";  // if a definite choice
   }
   ctx.fillText(str, x * TILE + 22, y * TILE + 35);
 }
@@ -339,6 +346,7 @@ function initdom() {
   addButton(controls, 'Resume', resume);
   addButton(controls, 'Step', singleStep);
   addButton(controls, 'Back', back);
+  addButton(controls, 'Reset', reset);
 
   const stats = document.createElement('div');
   stats.className = 'stats';
