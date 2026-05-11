@@ -46,7 +46,7 @@ let alpha = 0.1;
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
-const INIT_Y = 1, INIT_X = 4;
+const INIT_Y = ROWS - 1, INIT_X = 0;
 const GOAL_Y = ROWS - 1, GOAL_X = COLS - 1;
 
 // The qTable is an array of rows.
