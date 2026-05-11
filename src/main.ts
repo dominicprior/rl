@@ -110,6 +110,7 @@ function calcNextState(s: pair, a: dir) {
   if (a === 'RIGHT') x++;
   
   let reward = -1;
+  let done = false;
 
   // The Cliff
   if (y === 3 && x > 0 && x < COLS - 1) {
@@ -124,14 +125,16 @@ function calcNextState(s: pair, a: dir) {
     totalReward = 0;
     y = 3; // Back to start
     x = 0;
+    done = true;
   }
   const nextState = [y, x] as pair;
-  return { nextState, reward };
+  return { nextState, reward, done };
 }
 
-function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): void {
+function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, done: boolean): void {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
-  const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
+  const q = done ? 0 :
+              algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
   let target = reward + gamma * q;
   qValues(s)[a] += alpha * (target - qValues(s)[a]);
   maybe_decrease_qValueScale(qValues(s)[a], reward);
@@ -140,10 +143,10 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): 
 }
 
 function step(): void {
-  let { nextState, reward } = calcNextState(state, action);
+  let { nextState, reward, done } = calcNextState(state, action);
   totalReward += reward;
   let nextAction = chooseAction(nextState);
-  updateQ(state, action, nextState, nextAction, reward);
+  updateQ(state, action, nextState, nextAction, reward, done);
   state = nextState;
   action = nextAction;
   draw();
