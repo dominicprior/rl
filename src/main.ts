@@ -58,7 +58,8 @@ let timeoutId: number | null = null;
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 
-type historyItem = [ pair, dir, number ];
+type historyItem = [ pair, dir, number,     // state, action, Q value
+          number, number, number, number ]; // stats
 
 let history: Array<historyItem> = [];
 
@@ -146,11 +147,12 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
 
 function step(): void {
   let { nextState, reward, done } = calcNextState(state, action);
+  let nextAction = chooseAction(nextState);
+  history.push([[state[0], state[1]], action, qValues(state)[action],
+                  totalSteps, episode, steps, totalReward]);
   totalReward += reward;
   totalSteps++;
   steps++;
-  let nextAction = chooseAction(nextState);
-  history.push([[state[0], state[1]], action, qValues(state)[action]]);
   updateQ(state, action, nextState, nextAction, reward, done);
   state = nextState;
   action = nextAction;
@@ -185,9 +187,10 @@ function back() {
   pause();
   if (history.length !== 0) {
     const h = history.pop() as historyItem;
-    state = h[0];
+    state  = h[0];
     action = h[1];
-    qValues(state)[action] = h[2];
+    [qValues(state)[action],
+        totalSteps, episode, steps, totalReward ] = (h.slice(2) as Array<number>);
     draw();
   }
 }
@@ -304,8 +307,6 @@ function initdom() {
 
   const controls = document.createElement('div');
   controls.className = 'controls';
-
-  controls.append('Algorithm: ');
 
   const select = document.createElement('select');
   select.id = 'algoSelect';
