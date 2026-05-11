@@ -5,7 +5,6 @@
 
 // Here are some future enhancements.
 //
-// - A way to rewind the demo.
 // - Optional cliff.
 // - Variable w and h.
 // - Variable gamma, epsilon and alpha.
@@ -14,8 +13,16 @@
 // - Add a delay for the cliff and the goal.
 
 import './style.css'
+type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
+type pair = [number, number];  // for storing a state
+type historyItem = [ pair, dir, number,     // state, action, Q value
+          number, number, number, number ]; // stats
+
 const w = 600;
 const h = 240;
+const ROWS = 4, COLS = 10;
+const TILE = 60;  // tile size
+
 let timeout = 100;
 let logging = false;
 
@@ -36,32 +43,33 @@ let epsilon = 0;
 // The nudge factor for updating a Q value from a successor Q value.
 let alpha = 0.1;
 
-const ctx = initdom();
-
-const ROWS = 4, COLS = 10, TILE = 60;
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
-type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
-type pair = [number, number];
-
 // The qTable is an array of rows.
-// Each row is an array of mappings from direction to q-value.
-// i.e. y first again.
+// Each row is an array of cells.
+// Each cell is a mapping from direction to q-value.
+// y first again.
 let qTable: Array<Array<Record<dir, number> > >;  // e.g. qTable[0][0]['DOWN'] would be a Q value.
-resetQTable();
 
-let state: pair = [3, 0];  // y first, i.e. row first
-let action = chooseAction(state);
+let state: pair;  // y first, i.e. row first
+let action: dir;
 
 let timeoutId: number | null = null;
 
 let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 
-type historyItem = [ pair, dir, number,     // state, action, Q value
-          number, number, number, number ]; // stats
+let history: Array<historyItem>;
 
-let history: Array<historyItem> = [];
+const ctx = initdom();
+
+function resetGlobals(): void {
+  history = [];
+  totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
+  resetQTable();
+  state = [3, 0];  // y first, i.e. row first
+  action = chooseAction(state);
+}
 
 // The q-values for state s.  The pair is the y then the x.
 function qValues(s: pair): Record<dir, number> {
@@ -374,4 +382,5 @@ function log(...args: any[]): void {
   }
 }
 
+resetGlobals();
 scheduleNext();
