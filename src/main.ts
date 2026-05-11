@@ -5,7 +5,6 @@
 
 // Here are some future enhancements.
 //
-// - Pause and single-step buttons.
 // - A way to rewind the demo.
 // - Optional cliff.
 // - Variable w and h.
@@ -250,12 +249,15 @@ function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
   );
 
   const bestA = aa[0];  // e.g. 'UP'
-  ctx.fillStyle = "#f80";
   ctx.font = "20px Arial";
   const str = arrowStr(bestA);
-  if (q[aa[1]] !== 0) {
-      ctx.fillText(str, x * TILE + 22, y * TILE + 35);
+  if (q[aa[1]] === 0) {
+    ctx.fillStyle = "#ddd";
   }
+  else {
+    ctx.fillStyle = "#f80";
+  }
+  ctx.fillText(str, x * TILE + 22, y * TILE + 35);
 }
 
 function arrowStr(dir: dir): string {
