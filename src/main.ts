@@ -312,6 +312,8 @@ function initdom() {
   addButton(controls, 'Slower', () => { timeout *= 2 });
   addButton(controls, 'Toggle logging', () => { logging = !logging; });
   addButton(controls, 'Pause', pause);
+  addButton(controls, 'Resume', resume);
+  addButton(controls, 'Step', singleStep);
 
   const stats = document.createElement('div');
   stats.className = 'stats';
