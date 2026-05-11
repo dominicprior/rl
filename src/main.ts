@@ -110,7 +110,6 @@ function calcNextState(s: pair, a: dir) {
   if (a === 'RIGHT') x++;
   
   let reward = -1;
-  let done = false;
 
   // The Cliff
   if (y === 3 && x > 0 && x < COLS - 1) {
@@ -120,10 +119,14 @@ function calcNextState(s: pair, a: dir) {
   }
   else if (x === COLS - 1 && y === 3) {
     reward = 0;
-    done = true;
+    episode++;
+    steps = 0;
+    totalReward = 0;
+    y = 3; // Back to start
+    x = 0;
   }
   const nextState = [y, x] as pair;
-  return { nextState, reward, done };
+  return { nextState, reward };
 }
 
 function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): void {
@@ -136,15 +139,15 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): 
   log(maxNegQValue);
 }
 
-function step(): boolean {
-  let { nextState, reward, done } = calcNextState(state, action);
+function step(): void {
+  let { nextState, reward } = calcNextState(state, action);
   totalReward += reward;
   let nextAction = chooseAction(nextState);
   updateQ(state, action, nextState, nextAction, reward);
   state = nextState;
   action = nextAction;
   draw();
-  return done;
+  return;
 }
 
 function scheduleNext() {
@@ -173,9 +176,7 @@ async function loop() {
   let a = chooseAction(state);
 
   while (true) {
-    let reward: number;
-    let done: Boolean;
-    done = step();
+    step();
     steps++;
     totalSteps++;
 
@@ -186,13 +187,6 @@ async function loop() {
       state = [3, 0];  // row, col
       a = chooseAction(state);
       resetting = false;
-    }
-    else if (done || steps > 5000) {
-      episode++;
-      steps = 0;
-      totalReward = 0;
-      state = [3, 0];
-      a = chooseAction(state);
     }
     await new Promise(r => setTimeout(r, timeout));
   }
