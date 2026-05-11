@@ -176,7 +176,6 @@ function singleStep() {
   step();
 }
 async function loop() {
-  let a = chooseAction(state);
 
   while (true) {
     step();
@@ -184,13 +183,7 @@ async function loop() {
     totalSteps++;
 
     draw();
-    if (resetting) {
-      totalSteps = 0, episode = 0, steps = 0, totalReward = 0, maxNegQValue = 0;
-      resetQTable();
-      state = [3, 0];  // row, col
-      a = chooseAction(state);
-      resetting = false;
-    }
+
     await new Promise(r => setTimeout(r, timeout));
   }
 }
