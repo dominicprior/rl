@@ -6,7 +6,6 @@
 // Here are some future enhancements.
 //
 // - Optional cliff.
-// - Variable gamma, epsilon and alpha.
 // - A graph of the episode lengths.
 // - Split the animation into moving the agent and updating Q.
 // - Add a delay for the cliff and the goal.
@@ -34,20 +33,22 @@ let paramData: Record<string, param> = {
   // contribute equally to the overall return regardless of when they occur.
 
   gamma: ['Gamma', 1,   0, 1],
+
+  // Epsilon is the probability of exploring randomly, as opposed to greedily
+  // choosing the action with the highest Q value.  An epsilon of zero means it
+  // always chooses the highest, instead of exploring, which means Q-Learning
+  // and Sarsa are the same.  In this demo, the
+  // initial Q values are high (by being zero rather than negative), which
+  // makes the agent think every path is amazing until it tries it and is "disappointed."
+  // This forces it to traverse almost every arc in the graph at least once
+  // before it settles on a favourite.
+
+  epsilon: ['Epsilon', 0,   0, 1],
+
+  // Alpha is the nudge factor for updating a Q value from a successor Q value.
+
+  alpha: ['Alpha', 0.1,   0, 1],
 };
-
-// Epsilon is the probability of exploring randomly, as opposed to greedily
-// choosing the action with the highest Q value.  An epsilon of zero means it
-// always chooses the highest, instead of exploring, which means Q-Learning
-// and Sarsa are the same.  In this demo, the
-// initial Q values are high (by being zero rather than negative), which
-// makes the agent think every path is amazing until it tries it and is "disappointed."
-// This forces it to traverse almost every arc in the graph at least once
-// before it settles on a favourite.
-let epsilon = 0;
-
-// The nudge factor for updating a Q value from a successor Q value.
-let alpha = 0.1;
 
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
@@ -100,7 +101,7 @@ function qValues(s: pair): Record<dir, number> {
 // The epsilon-greedy action ('UP', 'DOWN', 'LEFT' or 'RIGHT')
 // from the state, s (a string containing the x and y, e.g. '0,3').
 function chooseAction(s: pair): dir {
-  if (Math.random() < epsilon) {
+  if (Math.random() < params.epsilon) {
     const aa = actions(s);
     return aa[Math.floor(Math.random() * aa.length)];
   }
@@ -167,7 +168,7 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
   const q = done ? 0 :
               algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
   let target = reward + params.gamma * q;
-  qValues(s)[a] += alpha * (target - qValues(s)[a]);
+  qValues(s)[a] += params.alpha * (target - qValues(s)[a]);
   maybe_decrease_qValueScale(qValues(s)[a], reward);
   log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(s)[a]);
   log(maxNegQValue);
@@ -410,7 +411,7 @@ function createNumberInput(id: string, param: param) {
   const wrapper = document.createElement('div');
 
   const lbl = document.createElement('label');
-  lbl.textContent = label;
+  lbl.textContent = label + ' ';
   lbl.htmlFor = id;
 
   const input = document.createElement('input');
