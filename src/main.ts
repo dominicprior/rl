@@ -50,6 +50,8 @@ let paramData: Record<string, param> = {
   rows: ['Rows', 4,  1, 10],
 
   init_y: ['Init Y', 3, 0, 10],
+
+  init_x: ['Init X', 0, 0, 10],
 };
 
 for (const [id, param] of Object.entries(paramData)) {
@@ -59,7 +61,6 @@ for (const [id, param] of Object.entries(paramData)) {
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
-const INIT_X = 0;
 const GOAL_Y = params.rows - 1, GOAL_X = COLS - 1;
 
 // The qTable is an array of rows.
@@ -98,7 +99,7 @@ function resetGlobals(): void {
   history = [];
   totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
   resetQTable();
-  state = [params.init_y, INIT_X];
+  state = [params.init_y, params.init_x];
   action = chooseAction(state);
 }
 
@@ -157,7 +158,7 @@ function calcNextState(s: pair, a: dir) {
   if (isCliff([y, x])) {
     reward = -100;
     y = params.init_y;
-    x = INIT_X;
+    x = params.init_x;
   }
   else if (isGoal([y, x])) {
     reward = 0;
@@ -165,7 +166,7 @@ function calcNextState(s: pair, a: dir) {
     steps = 0;
     totalReward = 0;
     y = params.init_y;
-    x = INIT_X;
+    x = params.init_x;
     done = true;
   }
   const nextState = [y, x] as pair;
@@ -267,6 +268,10 @@ function draw() {
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
 
+      if (x === params.init_x && y === params.init_y) {
+        ctx.fillStyle = '#ddddff';
+        ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
+      }
       drawArrow(ctx, s);
 
       // Draw the four q-values
