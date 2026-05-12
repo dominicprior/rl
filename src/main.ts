@@ -26,18 +26,15 @@ const thereIsACliff = true;
 let timeout = 100;
 let logging = false;
 
-let paramData: Record<string, param> = {
-  speed: ['Speed!', 50, 100, 0],
-};
 let params: Record<string, number> = {};
 
-// let params: Array<param> = [
-//   ['speed', 'Speed!', 50, 100, 0],
-// ];
+let paramData: Record<string, param> = {
 
-// Gamma is the discount factor for future rewards.  A value of 1 mean rewards
-// contribute equally to the overall return regardless of when they occur.
-let gamma = 1;
+  // Gamma is the discount factor for future rewards.  A value of 1 mean rewards
+  // contribute equally to the overall return regardless of when they occur.
+
+  gamma: ['Gamma', 1,   0, 1],
+};
 
 // Epsilon is the probability of exploring randomly, as opposed to greedily
 // choosing the action with the highest Q value.  An epsilon of zero means it
@@ -169,7 +166,7 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   const q = done ? 0 :
               algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
-  let target = reward + gamma * q;
+  let target = reward + params.gamma * q;
   qValues(s)[a] += alpha * (target - qValues(s)[a]);
   maybe_decrease_qValueScale(qValues(s)[a], reward);
   log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(s)[a]);
@@ -429,16 +426,8 @@ function createNumberInput(id: string, param: param) {
     if (!isNaN(val)) {
       params[input.id] = val;
     }
-    console.log(event);
-    console.log(input);
-    console.log(input.value);
-    console.log(params.speed);
+    console.log(input.id, val);
   })
-
-  // input.addEventListener('input', () => {
-  //   const val = parseFloat(input.value);
-  //   if (!isNaN(val)) onchange(val);
-  // });
 
   wrapper.appendChild(lbl);
   wrapper.appendChild(input);
