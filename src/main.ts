@@ -16,10 +16,8 @@ type pair = [number, number];  // for storing a state
 type historyItem = [ pair, dir, number,     // state, action, Q value
           number, number, number, number ]; // stats
 type param = [label: string, value: number, min: number, max: number];
-const ROWS = 4, COLS = 10;
+const COLS = 10;
 const TILE = 60;  // tile size
-const w = COLS * TILE;
-const h = ROWS * TILE;
 const thereIsACliff = true;
 
 let timeout = 100;
@@ -52,11 +50,15 @@ let paramData: Record<string, param> = {
   rows: ['Rows', 4,  1, 10],
 };
 
+for (const [id, param] of Object.entries(paramData)) {
+  params[id] = param[1];
+}
+
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
-const INIT_Y = ROWS - 1, INIT_X = 0;
-const GOAL_Y = ROWS - 1, GOAL_X = COLS - 1;
+const INIT_Y = params.rows - 1, INIT_X = 0;
+const GOAL_Y = params.rows - 1, GOAL_X = COLS - 1;
 
 // The qTable is an array of rows.
 // Each row is an array of cells.
@@ -81,7 +83,7 @@ let canvas: HTMLCanvasElement;
 function isCliff(pair: pair): boolean {
   const y = pair[0];
   const x = pair[1];
-  return thereIsACliff && (y === ROWS - 1 && x > 0 && x < COLS - 1);
+  return thereIsACliff && (y === params.rows - 1 && x > 0 && x < COLS - 1);
 }
 
 function isGoal(pair: pair): boolean {
@@ -246,8 +248,8 @@ function maybe_decrease_qValueScale(q: number, reward: number): void {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, w, h);
-  for (let y = 0; y < ROWS; y++) {
+  ctx.clearRect(0, 0, COLS * TILE, params.rows * TILE);
+  for (let y = 0; y < params.rows; y++) {
     for (let x = 0; x < COLS; x++) {
       let s = [y, x] as pair;
       ctx.strokeStyle = '#ccc';
@@ -327,7 +329,7 @@ function arrowStr(dir: dir): string {
 
 function resetQTable() {
   qTable = [];
-  for (let y = 0; y < ROWS; y++) {
+  for (let y = 0; y < params.rows; y++) {
     qTable.push([]);
     for (let x = 0; x < COLS; x++) {
       qTable[y].push({} as Record<dir, number>);
@@ -335,7 +337,7 @@ function resetQTable() {
       if (x > 0) q['LEFT'] = 0;
       if (y > 0) q['UP'] = 0;
       if (x < COLS - 1) q['RIGHT'] = 0;
-      if (y < ROWS - 1) q['DOWN'] = 0;
+      if (y < params.rows - 1) q['DOWN'] = 0;
     }
   }
 }
@@ -406,8 +408,8 @@ function setCanvas() {
     canvas.remove();
   }
   canvas = (document.createElement('canvas') as HTMLCanvasElement);
-  canvas.width = w;
-  canvas.height = h;
+  canvas.width = COLS * TILE;
+  canvas.height = params.rows * TILE;
   boxes.after(canvas);
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 }
