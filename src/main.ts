@@ -16,7 +16,7 @@ type pair = [number, number];  // for storing a state
 type historyItem = [ pair, dir, number,     // state, action, Q value
           number, number, number, number ]; // stats
 type param = [label: string, value: number, min: number, max: number];
-const COLS = 10;
+
 const TILE = 60;  // tile size
 
 let timeout = 100;
@@ -46,7 +46,8 @@ let paramData: Record<string, param> = {
 
   alpha: ['Alpha', 0.1,   0, 1],
 
-  rows: ['Rows', 4,   1, 10],
+  rows: ['Rows', 4,       1, 10],
+  cols: ['Columns', 10,   1, 10],
 
   init_y: ['Init Y', 3,   0, 10],
   init_x: ['Init X', 0,   0, 10],
@@ -253,9 +254,9 @@ function maybe_decrease_qValueScale(q: number, reward: number): void {
 }
 
 function draw() {
-  ctx.clearRect(0, 0, COLS * TILE, params.rows * TILE);
+  ctx.clearRect(0, 0, params.cols * TILE, params.rows * TILE);
   for (let y = 0; y < params.rows; y++) {
-    for (let x = 0; x < COLS; x++) {
+    for (let x = 0; x < params.cols; x++) {
       let s = [y, x] as pair;
       ctx.strokeStyle = '#ccc';
       ctx.strokeRect(x * TILE, y * TILE, TILE, TILE);
@@ -340,12 +341,12 @@ function resetQTable() {
   qTable = [];
   for (let y = 0; y < params.rows; y++) {
     qTable.push([]);
-    for (let x = 0; x < COLS; x++) {
+    for (let x = 0; x < params.cols; x++) {
       qTable[y].push({} as Record<dir, number>);
       const q = qTable[y][x];
       if (x > 0) q['LEFT'] = 0;
       if (y > 0) q['UP'] = 0;
-      if (x < COLS - 1) q['RIGHT'] = 0;
+      if (x < params.cols - 1) q['RIGHT'] = 0;
       if (y < params.rows - 1) q['DOWN'] = 0;
     }
   }
@@ -417,7 +418,7 @@ function setCanvas() {
     canvas.remove();
   }
   canvas = (document.createElement('canvas') as HTMLCanvasElement);
-  canvas.width = COLS * TILE;
+  canvas.width  = params.cols * TILE;
   canvas.height = params.rows * TILE;
   boxes.after(canvas);
   ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -451,10 +452,12 @@ function createNumberInput(id: string, param: param) {
       params[input.id] = val;
     }
     console.log(input.id, val);
-    if (input.id === 'rows') {
-      console.log('changing num rows');
-      params.init_y = params.rows - 1;
-      (document.getElementById('init_y') as HTMLInputElement).value = '' + params.init_y;
+    if (input.id in ['rows', 'cols']) {
+      console.log('changing size');
+      clamp('init_y', 'rows');
+      clamp('goal_y', 'rows');
+      clamp('init_x', 'cols');
+      clamp('goal_x', 'cols');
       pause();
       setCanvas();
       reset();
@@ -465,6 +468,13 @@ function createNumberInput(id: string, param: param) {
   wrapper.appendChild(lbl);
   wrapper.appendChild(input);
   return wrapper;
+}
+
+function clamp(param: string, limit: string) {
+  if (params[param] >= params[limit]) {
+    params[param] = params[limit] - 1;
+    (document.getElementById(param) as HTMLInputElement).value = '' + params[param];
+  }
 }
 
 function addButton(controls: HTMLDivElement, text: string, f: () => void) {
