@@ -18,7 +18,6 @@ type historyItem = [ pair, dir, number,     // state, action, Q value
 type param = [label: string, value: number, min: number, max: number];
 const COLS = 10;
 const TILE = 60;  // tile size
-const thereIsACliff = true;
 
 let timeout = 100;
 let logging = false;
@@ -47,11 +46,16 @@ let paramData: Record<string, param> = {
 
   alpha: ['Alpha', 0.1,   0, 1],
 
-  rows: ['Rows', 4,  1, 10],
+  rows: ['Rows', 4,   1, 10],
 
-  init_y: ['Init Y', 3, 0, 10],
+  init_y: ['Init Y', 3,   0, 10],
+  init_x: ['Init X', 0,   0, 10],
 
-  init_x: ['Init X', 0, 0, 10],
+  cliff_start: ['Cliff Start', 1,   0, 10],
+  cliff_end:   ['Cliff End',   8,   0, 10],
+
+  goal_y: ['Goal Y', 3,   0, 10],
+  goal_x: ['Goal X', 9,   0, 10],
 };
 
 for (const [id, param] of Object.entries(paramData)) {
@@ -60,8 +64,6 @@ for (const [id, param] of Object.entries(paramData)) {
 
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
-
-const GOAL_Y = params.rows - 1, GOAL_X = COLS - 1;
 
 // The qTable is an array of rows.
 // Each row is an array of cells.
@@ -86,13 +88,13 @@ let canvas: HTMLCanvasElement;
 function isCliff(pair: pair): boolean {
   const y = pair[0];
   const x = pair[1];
-  return thereIsACliff && (y === params.rows - 1 && x > 0 && x < COLS - 1);
+  return y === params.rows - 1 && x >= params.cliff_start && x <= params.cliff_end;
 }
 
 function isGoal(pair: pair): boolean {
   const y = pair[0];
   const x = pair[1];
-  return y === GOAL_Y && x === GOAL_X;
+  return y === params.goal_y && x === params.goal_x;
 }
 
 function resetGlobals(): void {
