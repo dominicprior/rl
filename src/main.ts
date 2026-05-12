@@ -48,6 +48,8 @@ let paramData: Record<string, param> = {
   // Alpha is the nudge factor for updating a Q value from a successor Q value.
 
   alpha: ['Alpha', 0.1,   0, 1],
+
+  rows: ['Rows', 4,  1, 10],
 };
 
 let qValueScale = TILE;  // pixels per unit q-value
@@ -338,7 +340,6 @@ function resetQTable() {
   }
 }
 
-
 function initdom() {
   app = (document.querySelector<HTMLDivElement>('#app') as HTMLDivElement);
 
@@ -393,20 +394,22 @@ function initdom() {
     addInput(boxes, id, param);
   }
 
-  //document.querySelector("canvas");
-
-  canvas = (document.createElement('canvas') as HTMLCanvasElement);
-  canvas.id = 'gridCanvas';
-  canvas.width = w;
-  canvas.height = h;
-
   app.appendChild(heading);
   app.appendChild(controls);
   app.appendChild(boxes);
-  boxes.after(canvas);
-  // app.appendChild(canvas);
+  setCanvas();
   app.appendChild(srctext);
-  return (canvas.getContext('2d') as CanvasRenderingContext2D);
+}
+
+function setCanvas() {
+  if (canvas) {
+    canvas.remove();
+  }
+  canvas = (document.createElement('canvas') as HTMLCanvasElement);
+  canvas.width = w;
+  canvas.height = h;
+  boxes.after(canvas);
+  ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
 }
 
 function addInput(controls: HTMLDivElement, id: string, param: param) {
@@ -437,6 +440,13 @@ function createNumberInput(id: string, param: param) {
       params[input.id] = val;
     }
     console.log(input.id, val);
+    if (input.id === 'rows') {
+      console.log('changing num rows');
+      pause();
+      setCanvas();
+      reset();
+      resume();
+    }
   })
 
   wrapper.appendChild(lbl);
@@ -457,7 +467,6 @@ function log(...args: any[]): void {
   }
 }
 
-ctx = initdom();
-
+initdom();
 resetGlobals();
 scheduleNext();
