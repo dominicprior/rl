@@ -48,6 +48,8 @@ let paramData: Record<string, param> = {
   alpha: ['Alpha', 0.1,   0, 1],
 
   rows: ['Rows', 4,  1, 10],
+
+  init_y: ['Init Y', 3, 0, 10],
 };
 
 for (const [id, param] of Object.entries(paramData)) {
@@ -57,7 +59,7 @@ for (const [id, param] of Object.entries(paramData)) {
 let qValueScale = TILE;  // pixels per unit q-value
 let maxNegQValue = 0; // apart from ones bordering the cliff
 
-const INIT_Y = params.rows - 1, INIT_X = 0;
+const INIT_X = 0;
 const GOAL_Y = params.rows - 1, GOAL_X = COLS - 1;
 
 // The qTable is an array of rows.
@@ -96,7 +98,7 @@ function resetGlobals(): void {
   history = [];
   totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
   resetQTable();
-  state = [INIT_Y, INIT_X];
+  state = [params.init_y, INIT_X];
   action = chooseAction(state);
 }
 
@@ -154,7 +156,7 @@ function calcNextState(s: pair, a: dir) {
 
   if (isCliff([y, x])) {
     reward = -100;
-    y = INIT_Y;
+    y = params.init_y;
     x = INIT_X;
   }
   else if (isGoal([y, x])) {
@@ -162,7 +164,7 @@ function calcNextState(s: pair, a: dir) {
     episode++;
     steps = 0;
     totalReward = 0;
-    y = INIT_Y;
+    y = params.init_y;
     x = INIT_X;
     done = true;
   }
@@ -444,6 +446,8 @@ function createNumberInput(id: string, param: param) {
     console.log(input.id, val);
     if (input.id === 'rows') {
       console.log('changing num rows');
+      params.init_y = params.rows - 1;
+      (document.getElementById('init_y') as HTMLInputElement).value = '' + params.init_y;
       pause();
       setCanvas();
       reset();
