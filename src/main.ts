@@ -342,7 +342,7 @@ function initdom() {
   heading.textContent = 'Cliff Walking Reinforcement Learning';
 
   const controls = document.createElement('div');
-  controls.className = 'controls';
+  const boxes = document.createElement('div');
 
   const select = document.createElement('select');
   select.id = 'algoSelect';
@@ -359,7 +359,6 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  // addButton(controls, 'Reset', () => {});
   addButton(controls, 'Faster', () => { timeout /= 2 });
   addButton(controls, 'Slower', () => { timeout *= 2 });
   addButton(controls, 'Toggle logging', () => { logging = !logging; });
@@ -386,7 +385,7 @@ function initdom() {
   controls.appendChild(stats);
   controls.appendChild(small);
   for (const [id, param] of Object.entries(paramData)) {
-    addInput(controls, id, param);
+    addInput(boxes, id, param);
   }
 
   const canvas = (document.createElement('canvas') as HTMLCanvasElement);
@@ -396,6 +395,7 @@ function initdom() {
 
   app.appendChild(heading);
   app.appendChild(controls);
+  app.appendChild(boxes);
   app.appendChild(canvas);
   app.appendChild(srctext);
   return (canvas.getContext('2d') as CanvasRenderingContext2D);
@@ -408,10 +408,11 @@ function addInput(controls: HTMLDivElement, id: string, param: param) {
 function createNumberInput(id: string, param: param) {
   const [label, value, min, max] = param;
   params[id] = value;
-  const wrapper = document.createElement('div');
+  const wrapper = document.createElement('span');
+  wrapper.style.margin = '10px';
 
   const lbl = document.createElement('label');
-  lbl.textContent = label + ' ';
+  lbl.textContent = ' ' + label + ' ';
   lbl.htmlFor = id;
 
   const input = document.createElement('input');
@@ -422,7 +423,7 @@ function createNumberInput(id: string, param: param) {
   // input.step = step ?? 1;
   input.value = '' + value;
 
-  input.addEventListener('change', (event) => {
+  input.addEventListener('change', () => {
     const val = parseFloat(input.value);
     if (!isNaN(val)) {
       params[input.id] = val;
