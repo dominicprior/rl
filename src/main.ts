@@ -16,7 +16,7 @@ type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
 type pair = [number, number];  // for storing a state
 type historyItem = [ pair, dir, number,     // state, action, Q value
           number, number, number, number ]; // stats
-type param = [id: string, label: string, min: number, max: number, value: number];
+type param = [id: string, label: string, value: number, min: number, max: number];
 const ROWS = 4, COLS = 10;
 const TILE = 60;  // tile size
 const w = COLS * TILE;
@@ -27,7 +27,7 @@ let timeout = 100;
 let logging = false;
 
 let params: Array<param> = [
-  ['speed', 'Speed!', 0, 100, 50],
+  ['speed', 'Speed!', 50, 100, 0],
 ];
 
 // Gamma is the discount factor for future rewards.  A value of 1 mean rewards
@@ -403,8 +403,7 @@ function addInput(controls: HTMLDivElement, param: param) {
 }
 
 function createNumberInput(param: param) {
-  const [id, label, min, max, value] = param;
-  // const [id: string, label: string, min: number, max: number, value: number] = param;
+  const [id, label, value, min, max] = param;
   const wrapper = document.createElement('div');
 
   const lbl = document.createElement('label');
