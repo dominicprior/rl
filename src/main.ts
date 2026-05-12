@@ -71,7 +71,10 @@ let totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
 
 let history: Array<historyItem>;
 
-const ctx = initdom();
+let app: HTMLDivElement;
+let boxes: HTMLDivElement;
+let ctx: CanvasRenderingContext2D;
+let canvas: HTMLCanvasElement;
 
 function isCliff(pair: pair): boolean {
   const y = pair[0];
@@ -335,14 +338,16 @@ function resetQTable() {
   }
 }
 
+
 function initdom() {
-  const app = (document.querySelector<HTMLDivElement>('#app') as HTMLDivElement);
+  app = (document.querySelector<HTMLDivElement>('#app') as HTMLDivElement);
 
   const heading = document.createElement('h2');
   heading.textContent = 'Cliff Walking Reinforcement Learning';
 
   const controls = document.createElement('div');
-  const boxes = document.createElement('div');
+  boxes = document.createElement('div');
+  boxes.id = 'boxes';
 
   const select = document.createElement('select');
   select.id = 'algoSelect';
@@ -388,7 +393,9 @@ function initdom() {
     addInput(boxes, id, param);
   }
 
-  const canvas = (document.createElement('canvas') as HTMLCanvasElement);
+  //document.querySelector("canvas");
+
+  canvas = (document.createElement('canvas') as HTMLCanvasElement);
   canvas.id = 'gridCanvas';
   canvas.width = w;
   canvas.height = h;
@@ -396,7 +403,8 @@ function initdom() {
   app.appendChild(heading);
   app.appendChild(controls);
   app.appendChild(boxes);
-  app.appendChild(canvas);
+  boxes.after(canvas);
+  // app.appendChild(canvas);
   app.appendChild(srctext);
   return (canvas.getContext('2d') as CanvasRenderingContext2D);
 }
@@ -448,6 +456,8 @@ function log(...args: any[]): void {
     console.log(...args);
   }
 }
+
+ctx = initdom();
 
 resetGlobals();
 scheduleNext();
