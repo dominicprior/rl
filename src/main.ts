@@ -26,9 +26,10 @@ const thereIsACliff = true;
 let timeout = 100;
 let logging = false;
 
-let params: Record<string, param> = {
+let paramData: Record<string, param> = {
   speed: ['Speed!', 50, 100, 0],
 };
+let params: Record<string, number> = {};
 
 // let params: Array<param> = [
 //   ['speed', 'Speed!', 50, 100, 0],
@@ -386,7 +387,7 @@ function initdom() {
   controls.appendChild(select);
   controls.appendChild(stats);
   controls.appendChild(small);
-  for (const [id, param] of Object.entries(params)) {
+  for (const [id, param] of Object.entries(paramData)) {
     addInput(controls, id, param);
   }
 
@@ -408,6 +409,7 @@ function addInput(controls: HTMLDivElement, id: string, param: param) {
 
 function createNumberInput(id: string, param: param) {
   const [label, value, min, max] = param;
+  params[id] = value;
   const wrapper = document.createElement('div');
 
   const lbl = document.createElement('label');
@@ -425,12 +427,12 @@ function createNumberInput(id: string, param: param) {
   input.addEventListener('change', (event) => {
     const val = parseFloat(input.value);
     if (!isNaN(val)) {
-      params[input.id][1] = val;
+      params[input.id] = val;
     }
     console.log(event);
     console.log(input);
     console.log(input.value);
-    console.log(params.speed[1]);
+    console.log(params.speed);
   })
 
   // input.addEventListener('input', () => {
