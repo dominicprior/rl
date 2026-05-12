@@ -16,7 +16,7 @@ type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
 type pair = [number, number];  // for storing a state
 type historyItem = [ pair, dir, number,     // state, action, Q value
           number, number, number, number ]; // stats
-
+type param = [id: string, label: string, min: number, max: number, value: number];
 const ROWS = 4, COLS = 10;
 const TILE = 60;  // tile size
 const w = COLS * TILE;
@@ -25,6 +25,10 @@ const thereIsACliff = true;
 
 let timeout = 100;
 let logging = false;
+
+let params: Array<param> = [
+  ['speed', 'Speed!', 0, 100, 50],
+];
 
 // Gamma is the discount factor for future rewards.  A value of 1 mean rewards
 // contribute equally to the overall return regardless of when they occur.
@@ -378,6 +382,9 @@ function initdom() {
   controls.appendChild(select);
   controls.appendChild(stats);
   controls.appendChild(small);
+  for (const param of params) {
+    addInput(controls, param);
+  }
 
   const canvas = (document.createElement('canvas') as HTMLCanvasElement);
   canvas.id = 'gridCanvas';
@@ -389,6 +396,42 @@ function initdom() {
   app.appendChild(canvas);
   app.appendChild(srctext);
   return (canvas.getContext('2d') as CanvasRenderingContext2D);
+}
+
+function addInput(controls: HTMLDivElement, param: param) {
+  controls.appendChild(createNumberInput(param))
+}
+
+function createNumberInput(param: param) {
+  const [id, label, min, max, value] = param;
+  // const [id: string, label: string, min: number, max: number, value: number] = param;
+  const wrapper = document.createElement('div');
+
+  const lbl = document.createElement('label');
+  lbl.textContent = label;
+  lbl.htmlFor = id;
+
+  const input = document.createElement('input');
+  input.type = 'number';
+  input.id = id;
+  input.min = '' + min;
+  input.max = '' + max;
+  // input.step = step ?? 1;
+  input.value = '' + value;
+
+  input.addEventListener('change', (event) => {
+    console.log(event);
+    console.log(input.value);
+  })
+
+  // input.addEventListener('input', () => {
+  //   const val = parseFloat(input.value);
+  //   if (!isNaN(val)) onchange(val);
+  // });
+
+  wrapper.appendChild(lbl);
+  wrapper.appendChild(input);
+  return wrapper;
 }
 
 function addButton(controls: HTMLDivElement, text: string, f: () => void) {
