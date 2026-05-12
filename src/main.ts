@@ -452,7 +452,7 @@ function createNumberInput(id: string, param: param) {
       params[input.id] = val;
     }
     console.log(input.id, val);
-    if (input.id in ['rows', 'cols']) {
+    if (['rows', 'cols'].includes(input.id)) {
       console.log('changing size');
       clamp('init_y', 'rows');
       clamp('goal_y', 'rows');
