@@ -465,10 +465,8 @@ function createNumberInput(id: string, param: param) {
       clamp('goal_y', 'rows');
       clamp('init_x', 'cols');
       clamp('goal_x', 'cols');
-      stop_animation();
       createCanvas();
       reset_and_stop();
-      resume_animation();
     }
   })
 
