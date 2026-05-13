@@ -100,7 +100,7 @@ function isGoal(pair: pair): boolean {
   return y === params.goal_y && x === params.goal_x;
 }
 
-function resetGlobals(): void {
+function reset_qTable_and_state(): void {
   history = [];
   totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
   resetQTable();
@@ -211,30 +211,30 @@ function scheduleNext() {
   }, timeout);
 }
 
-function reset() {
-  pause();
-  resetGlobals();
+function reset_and_stop() {
+  stop_animation();
+  reset_qTable_and_state();
   draw();
 }
 
-function pause() {
+function stop_animation() {
   if (timeoutId !== null) {
     clearTimeout(timeoutId);
     timeoutId = null;
   }
 }
 
-function resume() {
+function resume_animation() {
   if (timeoutId === null) scheduleNext();
 }
 
 function singleStep() {
-  pause();
+  stop_animation();
   step();
 }
 
 function back() {
-  pause();
+  stop_animation();
   if (history.length !== 0) {
     const h = history.pop() as historyItem;
     state  = h[0];
@@ -382,11 +382,16 @@ function initdom() {
   addButton(controls, 'Faster', () => { timeout /= 2 });
   addButton(controls, 'Slower', () => { timeout *= 2 });
   addButton(controls, 'Toggle logging', () => { logging = !logging; });
-  addButton(controls, 'Pause', pause);
-  addButton(controls, 'Resume', resume);
+  addButton(controls, 'Pause', stop_animation);
+  addButton(controls, 'Resume', resume_animation);
   addButton(controls, 'Step', singleStep);
   addButton(controls, 'Back', back);
-  addButton(controls, 'Reset', reset);
+  addButton(controls, 'Reset', reset_and_stop);
+  addButton(controls, 'Tiny', () => {
+    params.cols = 12;
+    createCanvas();
+    reset_and_stop();
+  });
 
   const stats = document.createElement('div');
   stats.className = 'stats';
@@ -411,11 +416,11 @@ function initdom() {
   app.appendChild(heading);
   app.appendChild(controls);
   app.appendChild(boxes);
-  setCanvas();
+  createCanvas();
   app.appendChild(srctext);
 }
 
-function setCanvas() {
+function createCanvas() {
   if (canvas) {
     canvas.remove();
   }
@@ -460,10 +465,10 @@ function createNumberInput(id: string, param: param) {
       clamp('goal_y', 'rows');
       clamp('init_x', 'cols');
       clamp('goal_x', 'cols');
-      pause();
-      setCanvas();
-      reset();
-      resume();
+      stop_animation();
+      createCanvas();
+      reset_and_stop();
+      resume_animation();
     }
   })
 
@@ -493,5 +498,5 @@ function log(...args: any[]): void {
 }
 
 initdom();
-resetGlobals();
+reset_qTable_and_state();
 scheduleNext();
