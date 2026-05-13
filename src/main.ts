@@ -57,6 +57,8 @@ let paramData: Record<string, param> = {
 
   goal_y: ['Goal Y', 3,   0, 10],
   goal_x: ['Goal X', 9,   0, 10],
+
+  cliff_penalty: ['Cliff Penalty', 100,   0, 500],
 };
 
 for (const [id, param] of Object.entries(paramData)) {
@@ -159,7 +161,7 @@ function calcNextState(s: pair, a: dir) {
   let done = false;
 
   if (isCliff([y, x])) {
-    reward = -100;
+    reward = -params.cliff_penalty;
     y = params.init_y;
     x = params.init_x;
   }
