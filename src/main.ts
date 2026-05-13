@@ -149,7 +149,7 @@ function scores(s: pair): Array<number> {
 }
 
 // The result of taking action a from state s.
-function calcNextState(s: pair, a: dir) {
+function lookupNextState(s: pair, a: dir) {
   let y = s[0];
   let x = s[1];
   if (a === 'UP')    y--;
@@ -182,15 +182,15 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
   const q = done ? 0 :
               algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
-  let target = reward + params.gamma * q;
-  qValues(s)[a] += params.alpha * (target - qValues(s)[a]);
+  let targetValue = reward + params.gamma * q;
+  qValues(s)[a] += params.alpha * (targetValue - qValues(s)[a]);
   maybe_decrease_qValueScale(qValues(s)[a], reward);
-  log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + target, 'newQ=' + qValues(s)[a]);
+  log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + targetValue, 'newQ=' + qValues(s)[a]);
   log(maxNegQValue);
 }
 
 function step(): void {
-  let { nextState, reward, done } = calcNextState(state, action);
+  let { nextState, reward, done } = lookupNextState(state, action);
   let nextAction = chooseAction(nextState);
   history.push([[state[0], state[1]], action, qValues(state)[action],
                   totalSteps, episode, steps, totalReward]);
