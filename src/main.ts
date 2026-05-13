@@ -272,14 +272,14 @@ function draw() {
       }
 
       if (x === params.init_x && y === params.init_y) {
-        ctx.fillStyle = '#ddddff';
+        ctx.fillStyle = '#ffffbb';
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
       drawArrow(ctx, s);
 
       // Draw the four q-values
       if (!isCliff(s) && !isGoal(s)) {
-        ctx.fillStyle = '#000000';
+        ctx.fillStyle = '#ff0000';
         const q = qValues(s);
         if ('UP' in q) {
           const ww = Math.min(-q['UP'] * qValueScale, TILE - 4);
