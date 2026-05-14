@@ -211,7 +211,7 @@ function scheduleNext() {
   }, timeout);
 }
 
-function reset_and_stop() {
+function stop_and_reset() {
   stop_animation();
   reset_qTable_and_state();
   draw();
@@ -386,11 +386,11 @@ function initdom() {
   addButton(controls, 'Resume', resume_animation);
   addButton(controls, 'Step', singleStep);
   addButton(controls, 'Back', back);
-  addButton(controls, 'Reset', reset_and_stop);
+  addButton(controls, 'Reset', stop_and_reset);
   addButton(controls, 'Tiny', () => {
     setParam('cols', 12);
     createCanvas();
-    reset_and_stop();
+    stop_and_reset();
   });
 
   const stats = document.createElement('div');
@@ -466,7 +466,7 @@ function createNumberInput(id: string, param: param) {
       clamp('init_x', 'cols');
       clamp('goal_x', 'cols');
       createCanvas();
-      reset_and_stop();
+      stop_and_reset();
     }
   })
 
