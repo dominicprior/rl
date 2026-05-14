@@ -167,7 +167,7 @@ function lookupNextState(s: pair, a: dir) {
   else if (isGoal([y, x])) {
     reward = 0;
     episode++;
-    steps = 0;
+    steps = -1;  // so it becomes zero after the steps++
     totalReward = 0;
     y = params.init_y;
     x = params.init_x;
