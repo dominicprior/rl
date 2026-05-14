@@ -5,7 +5,6 @@
 
 // Here are some future enhancements.
 //
-// - Optional cliff.
 // - A graph of the episode lengths.
 // - Split the animation into moving the agent and updating Q.
 // - Add a delay for the cliff and the goal.
@@ -189,7 +188,7 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
   log(maxNegQValue);
 }
 
-function step(): void {
+function step(): boolean {
   let { nextState, reward, done } = lookupNextState(state, action);
   let nextAction = chooseAction(nextState);
   history.push([[state[0], state[1]], action, qValues(state)[action],
@@ -201,13 +200,18 @@ function step(): void {
   state = nextState;
   action = nextAction;
   draw();
-  return;
+  return done;
 }
 
 function scheduleNext() {
   timeoutId = setTimeout(() => {
-    step();
-    scheduleNext();
+    const done = step();
+    if (done) {
+      timeoutId = null;
+    }
+    else {
+      scheduleNext();
+    }
   }, timeout);
 }
 
