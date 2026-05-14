@@ -189,10 +189,10 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, d
 }
 
 function step(): boolean {
-  let { nextState, reward, done } = lookupNextState(state, action);
-  let nextAction = chooseAction(nextState);
   history.push([[state[0], state[1]], action, qValues(state)[action],
                   totalSteps, episode, steps, totalReward]);
+  let { nextState, reward, done } = lookupNextState(state, action);
+  let nextAction = chooseAction(nextState);
   totalReward += reward;
   totalSteps++;
   steps++;
