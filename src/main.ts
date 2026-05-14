@@ -388,7 +388,7 @@ function initdom() {
   addButton(controls, 'Back', back);
   addButton(controls, 'Reset', reset_and_stop);
   addButton(controls, 'Tiny', () => {
-    params.cols = 12;
+    setParam('cols', 12);
     createCanvas();
     reset_and_stop();
   });
@@ -477,9 +477,13 @@ function createNumberInput(id: string, param: param) {
 
 function clamp(param: string, limit: string) {
   if (params[param] >= params[limit]) {
-    params[param] = params[limit] - 1;
-    (document.getElementById(param) as HTMLInputElement).value = '' + params[param];
+    setParam(param, params[limit] - 1);
   }
+}
+
+function setParam(param: string, value: number) {
+  params[param] = value;
+  (document.getElementById(param) as HTMLInputElement).value = '' + value;
 }
 
 function addButton(controls: HTMLDivElement, text: string, f: () => void) {
