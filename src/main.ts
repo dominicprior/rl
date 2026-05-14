@@ -388,7 +388,34 @@ function initdom() {
   addButton(controls, 'Back', back);
   addButton(controls, 'Reset', stop_and_reset);
   addButton(controls, 'Tiny', () => {
-    setParam('cols', 12);
+    setParam('cols', 4);
+    setParam('rows', 1);
+    clampParams();
+    setParam('cliff_end', 0);
+    createCanvas();
+    stop_and_reset();
+  });
+  addButton(controls, 'Small', () => {
+    setParam('cols', 5);
+    setParam('rows', 2);
+    clampParams();
+    setParam('cliff_end', 3);
+    createCanvas();
+    stop_and_reset();
+  });
+  addButton(controls, 'Medium', () => {
+    setParam('cols', 6);
+    setParam('rows', 3);
+    clampParams();
+    setParam('cliff_end', 4);
+    createCanvas();
+    stop_and_reset();
+  });
+  addButton(controls, 'Large', () => {
+    setParam('cols', 10);
+    setParam('rows', 4);
+    clampParams();
+    setParam('cliff_end', 8);
     createCanvas();
     stop_and_reset();
   });
@@ -461,10 +488,7 @@ function createNumberInput(id: string, param: param) {
     console.log(input.id, val);
     if (['rows', 'cols'].includes(input.id)) {
       console.log('changing size');
-      clamp('init_y', 'rows');
-      clamp('goal_y', 'rows');
-      clamp('init_x', 'cols');
-      clamp('goal_x', 'cols');
+      clampParams();
       createCanvas();
       stop_and_reset();
     }
@@ -473,6 +497,12 @@ function createNumberInput(id: string, param: param) {
   wrapper.appendChild(lbl);
   wrapper.appendChild(input);
   return wrapper;
+}
+
+function clampParams() {
+  clamp('init_y', 'rows');
+  clamp('goal_y', 'rows');
+  clamp('goal_x', 'cols');
 }
 
 function clamp(param: string, limit: string) {
