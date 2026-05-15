@@ -45,17 +45,17 @@ let paramData: Record<string, param> = {
 
   alpha: ['Alpha', 0.1,   0, 1],
 
-  rows: ['Rows', 4,       1, 10],
-  cols: ['Columns', 10,   1, 10],
+  rows: ['Rows', 1,       1, 10],
+  cols: ['Columns', 3,   1, 10],
 
-  init_y: ['Init Y', 3,   0, 10],
+  init_y: ['Init Y', 0,   0, 10],
   init_x: ['Init X', 0,   0, 10],
 
   cliff_start: ['Cliff Start', 1,   0, 10],
-  cliff_end:   ['Cliff End',   8,   0, 10],
+  cliff_end:   ['Cliff End',   0,   0, 10],
 
-  goal_y: ['Goal Y', 3,   0, 10],
-  goal_x: ['Goal X', 9,   0, 10],
+  goal_y: ['Goal Y', 0,   0, 10],
+  goal_x: ['Goal X', 2,   0, 10],
 
   cliff_penalty: ['Cliff Penalty', 100,   0, 500],
 };
@@ -392,7 +392,7 @@ function initdom() {
   addButton(controls, 'Back', back);
   addButton(controls, 'Reset', stop_and_reset);
   addButton(controls, 'Tiny', () => {
-    setParam('cols', 4);
+    setParam('cols', 3);
     setParam('rows', 1);
     clampParams();
     setParam('cliff_end', 0);
