@@ -45,6 +45,8 @@ let paramData: Record<string, param> = {
 
   alpha: ['Alpha', 0.1,   0, 1],
 
+  goalReward: ['Reward', 10, 0, 20],
+
   rows: ['Rows', 1,       1, 10],
   cols: ['Columns', 3,   1, 10],
 
@@ -178,28 +180,25 @@ function step(): boolean {
   history.push([[state[0], state[1]], action, qValues(state)[action],
                   totalSteps, episode, steps, totalReward]);
   let pause = false;
-  if (flag) {  // if we reached the goal last time - maybe: "if (isGoal(state))"
-    // do second half of step - we did the updateQ already
-    state = [params.init_y, params.init_x];
+  if (isGoal(state)) {  // if we reached the goal last time
+    // do second half of the step - we did the updateQ already
+    state = [params.init_y, params.init_x];  // teleport to the start
     action = chooseAction(state);
-    flag = false;
   }
   else {
-    // ordinary
+    // ordinary step, not second half of another step
     let { nextState, reward } = lookupNextState(state, action);
     if (isGoal(nextState)) {
-      // do first half of step - moving onto the goal tile - pause scheduling - done is true
-      nudgeQ(state, action, goalReward);  // ??? non-zero epsilon?
+      // do the first half of the step - moving onto the goal tile - pause scheduling - done is true
+      nudgeQ(state, action, params.goalReward);  // ??? non-zero epsilon?
       state = nextState;  // but no action
       pause = true;
-      flag = true;
     }
-    else {  // ordinary stuff
+    else {  // ordinary step that didn't reach the goal
       let nextAction = chooseAction(nextState);
       updateQ(state, action, nextState, nextAction, reward);
       state = nextState;
       action = nextAction;
-      // flag remains false
     }
   }
   draw();
