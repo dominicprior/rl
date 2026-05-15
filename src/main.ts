@@ -177,17 +177,6 @@ function lookupNextState(s: pair, a: dir) {
   return { nextState, reward, done };
 }
 
-function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, done: boolean): void {
-  let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
-  const q = done ? 0 :
-              algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
-  let targetValue = reward + params.gamma * q;
-  qValues(s)[a] += params.alpha * (targetValue - qValues(s)[a]);
-  maybe_decrease_qValueScale(qValues(s)[a], reward);
-  log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + targetValue, 'newQ=' + qValues(s)[a]);
-  log(maxNegQValue);
-}
-
 function step(): boolean {
   history.push([[state[0], state[1]], action, qValues(state)[action],
                   totalSteps, episode, steps, totalReward]);
@@ -213,6 +202,17 @@ function scheduleNext() {
       scheduleNext();
     }
   }, timeout);
+}
+
+function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, done: boolean): void {
+  let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
+  const q = done ? 0 :
+              algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
+  let targetValue = reward + params.gamma * q;
+  qValues(s)[a] += params.alpha * (targetValue - qValues(s)[a]);
+  maybe_decrease_qValueScale(qValues(s)[a], reward);
+  log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + targetValue, 'newQ=' + qValues(s)[a]);
+  log(maxNegQValue);
 }
 
 function stop_and_reset() {
