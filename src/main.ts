@@ -166,9 +166,6 @@ function lookupNextState(s: pair, a: dir) {
   }
   else if (isGoal([y, x])) {
     reward = 0;
-    episode++;
-    steps = -1;  // so it becomes zero after the steps++
-    totalReward = 0;
     y = params.init_y;
     x = params.init_x;
     done = true;
@@ -182,9 +179,6 @@ function step(): boolean {
                   totalSteps, episode, steps, totalReward]);
   let { nextState, reward, done } = lookupNextState(state, action);
   let nextAction = chooseAction(nextState);
-  totalReward += reward;
-  totalSteps++;
-  steps++;
   updateQ(state, action, nextState, nextAction, reward, done);
   state = nextState;
   action = nextAction;
