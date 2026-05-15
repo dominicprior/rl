@@ -157,39 +157,59 @@ function lookupNextState(s: pair, a: dir) {
   if (a === 'RIGHT') x++;
 
   let reward = -1;
-  let done = false;
+  // let done = false;
 
   if (isCliff([y, x])) {
     reward = -params.cliff_penalty;
     y = params.init_y;
     x = params.init_x;
   }
-  else if (isGoal([y, x])) {
-    reward = 0;
-    y = params.init_y;
-    x = params.init_x;
-    done = true;
-  }
+  // else if (isGoal([y, x])) {
+  //   reward = 0;
+  //   y = params.init_y;
+  //   x = params.init_x;
+  //   done = true;
+  // }
   const nextState = [y, x] as pair;
-  return { nextState, reward, done };
+  return { nextState, reward };
 }
 
 function step(): boolean {
   history.push([[state[0], state[1]], action, qValues(state)[action],
                   totalSteps, episode, steps, totalReward]);
-  let { nextState, reward, done } = lookupNextState(state, action);
-  let nextAction = chooseAction(nextState);
-  updateQ(state, action, nextState, nextAction, reward, done);
-  state = nextState;
-  action = nextAction;
+  let pause = false;
+  if (flag) {  // if we reached the goal last time - maybe: "if (isGoal(state))"
+    // do second half of step - we did the updateQ already
+    state = [params.init_y, params.init_x];
+    action = chooseAction(state);
+    flag = false;
+  }
+  else {
+    // ordinary
+    let { nextState, reward } = lookupNextState(state, action);
+    if (isGoal(nextState)) {
+      // do first half of step - moving onto the goal tile - pause scheduling - done is true
+      nudgeQ(state, action, goalReward);  // ??? non-zero epsilon?
+      state = nextState;  // but no action
+      pause = true;
+      flag = true;
+    }
+    else {  // ordinary stuff
+      let nextAction = chooseAction(nextState);
+      updateQ(state, action, nextState, nextAction, reward);
+      state = nextState;
+      action = nextAction;
+      // flag remains false
+    }
+  }
   draw();
-  return done;
+  return pause;  // something to tell scheduleNext whether to schedule or not.
 }
 
 function scheduleNext() {
   timeoutId = setTimeout(() => {
-    const done = step();
-    if (done) {
+    const pause = step();
+    if (pause) {
       timeoutId = null;
     }
     else {
@@ -198,15 +218,19 @@ function scheduleNext() {
   }, timeout);
 }
 
-function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number, done: boolean): void {
+function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): void {
   let algo = (document.getElementById('algoSelect') as HTMLSelectElement).value;
-  const q = done ? 0 :
-              algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
+  const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
   let targetValue = reward + params.gamma * q;
-  qValues(s)[a] += params.alpha * (targetValue - qValues(s)[a]);
+  nudgeQ(s, a, targetValue);
   maybe_decrease_qValueScale(qValues(s)[a], reward);
-  log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + targetValue, 'newQ=' + qValues(s)[a]);
-  log(maxNegQValue);
+  // log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + targetValue, 'newQ=' + qValues(s)[a]);
+  // log(maxNegQValue);
+}
+
+function nudgeQ(s: pair, a: dir, targetValue: number) {
+  qValues(s)[a] += params.alpha * (targetValue - qValues(s)[a]);
+  // maybe_decrease_qValueScale(qValues(s)[a], reward); ???
 }
 
 function stop_and_rewind() {
