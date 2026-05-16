@@ -67,7 +67,8 @@ for (const [id, param] of Object.entries(paramData)) {
   params[id] = param[1];
 }
 
-let qValueScale = TILE * 0.05;  // pixels per unit q-value
+const initialQValueScale = TILE * 0.05;
+let qValueScale = initialQValueScale;  // pixels per unit q-value
 let maxAbsQValue = 0;
 
 // The qTable is an array of rows.
@@ -106,7 +107,8 @@ function rewind(): void {
   history = [];
   totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
   resetQTable();
-  qValueScale = TILE * 0.2;
+  qValueScale = initialQValueScale;
+  maxAbsQValue = 0;
   
   state = [params.init_y, params.init_x];
   action = chooseAction(state);
@@ -282,7 +284,7 @@ function back() {
 function maybe_decrease_qValueScale(q: number): void {
   if (Math.abs(q) > maxAbsQValue) {
     maxAbsQValue = Math.abs(q);
-    if (maxAbsQValue * qValueScale > 0.9 * TILE) {
+    while (maxAbsQValue * qValueScale > 0.9 * TILE) {
       qValueScale /= 2;
     }
   }
