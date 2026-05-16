@@ -476,7 +476,7 @@ function initdom() {
 
   const small = document.createElement('small');
   small.textContent =
-    'Blue = Agent | Pink = Cliff | Green = Goal | Orange arrows = Policy | Black lines = Q values';
+    'Blue = Agent | Pink = Cliff | Green = Goal | Arrows = Policy | Black lines = positive Q values | Red lines = negative Q values';
 
   const srctext = document.createElement('small');
   srctext.innerHTML =
