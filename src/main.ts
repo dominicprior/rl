@@ -19,6 +19,7 @@ type param = [label: string, value: number, min: number, max: number];
 const TILE = 60;  // tile size
 
 let timeout = 100;
+let stopAfterEpisode = true;
 let logging = false;
 
 let params: Record<string, number> = {};
@@ -209,7 +210,7 @@ function step(): boolean {
 
 function scheduleNext() {
   timeoutId = setTimeout(() => {
-    const pause = step();
+    const pause = step() && stopAfterEpisode;
     if (pause) {
       timeoutId = null;
     }
@@ -248,7 +249,15 @@ function stop_animation() {
 }
 
 function resume_animation() {
-  if (timeoutId === null) scheduleNext();
+  stopAfterEpisode = false;
+  if (timeoutId === null)
+    scheduleNext();
+}
+
+function resume_episode() {
+  stopAfterEpisode = true;
+  if (timeoutId === null)
+    scheduleNext();
 }
 
 function singleStep() {
@@ -364,7 +373,7 @@ function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
     ctx.fillStyle = "#ddd";  // if still a tie
   }
   else {
-    ctx.fillStyle = "#f80";  // if a definite choice
+    ctx.fillStyle = "#00f";  // if a definite choice
   }
   const isThin = bestA === 'UP' || bestA === 'DOWN';
   ctx.fillText(str, (x + (isThin ? 0.42 : 0.35)) * TILE,
@@ -419,6 +428,7 @@ function initdom() {
   addButton(controls, 'Slower', () => { timeout *= 2 });
   addButton(controls, 'Toggle logging', () => { logging = !logging; });
   addButton(controls, 'Pause', stop_animation);
+  addButton(controls, 'Resume episode', resume_episode);
   addButton(controls, 'Resume', resume_animation);
   addButton(controls, 'Step', singleStep);
   addButton(controls, 'Back', back);
