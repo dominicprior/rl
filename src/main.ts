@@ -300,7 +300,9 @@ function draw() {
         ctx.fillStyle = '#ffffbb';
         ctx.fillRect(x * TILE, y * TILE, TILE, TILE);
       }
-      drawArrow(ctx, s);
+      if (!isGoal(s) && !isCliff(s)) {
+        drawArrow(ctx, s);
+      }
 
       // Draw the four q-values
       if (!isCliff(s) && !isGoal(s)) {
