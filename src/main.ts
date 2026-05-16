@@ -67,8 +67,8 @@ for (const [id, param] of Object.entries(paramData)) {
   params[id] = param[1];
 }
 
-let qValueScale = TILE;  // pixels per unit q-value
-let maxNegQValue = 0; // apart from ones bordering the cliff
+let qValueScale = TILE * 0.05;  // pixels per unit q-value
+let maxAbsQValue = 0;
 
 // The qTable is an array of rows.
 // Each row is an array of cells.
@@ -106,6 +106,8 @@ function rewind(): void {
   history = [];
   totalSteps = 0, episode = 0, steps = 0, totalReward = 0;
   resetQTable();
+  qValueScale = TILE * 0.2;
+  
   state = [params.init_y, params.init_x];
   action = chooseAction(state);
 }
@@ -225,14 +227,13 @@ function updateQ(s: pair, a: dir, next: pair, nextAction: dir, reward: number): 
   const q = algo === 'qlearning' ? highestScore(next) : qValues(next)[nextAction];
   let targetValue = reward + params.gamma * q;
   nudgeQ(s, a, targetValue);
-  maybe_decrease_qValueScale(qValues(s)[a], reward);
   // log(s, a, ' ', next, nextAction, ' ', 'q=' + q, 'target=' + targetValue, 'newQ=' + qValues(s)[a]);
   // log(maxNegQValue);
 }
 
 function nudgeQ(s: pair, a: dir, targetValue: number) {
   qValues(s)[a] += params.alpha * (targetValue - qValues(s)[a]);
-  // maybe_decrease_qValueScale(qValues(s)[a], reward); ???
+  maybe_decrease_qValueScale(qValues(s)[a]);
 }
 
 function stop_and_rewind() {
@@ -278,10 +279,10 @@ function back() {
 }
 
 // Make sure the q-values lines fit inside the tiles.
-function maybe_decrease_qValueScale(q: number, reward: number): void {
-  if (-q > maxNegQValue && reward !== -100) {
-    maxNegQValue = -q;
-    if (maxNegQValue * qValueScale > 0.9 * TILE) {
+function maybe_decrease_qValueScale(q: number): void {
+  if (Math.abs(q) > maxAbsQValue) {
+    maxAbsQValue = Math.abs(q);
+    if (maxAbsQValue * qValueScale > 0.9 * TILE) {
       qValueScale /= 2;
     }
   }
@@ -350,7 +351,7 @@ function draw() {
 }
 
 function qSize(qValue: number): number {
-  return Math.min(Math.abs(qValue) * qValueScale, TILE - 4);
+  return Math.abs(qValue) * qValueScale;
 }
 
 function qColour(size: number): string {
