@@ -48,7 +48,8 @@ let paramData: Record<string, param> = {
 
   goalReward: ['Reward', 10, 0, 20],
 
-rows: ['Rows', 4,       1, 10],
+  cliff_penalty: ['Cliff Penalty', 10,   0, 500],
+  rows: ['Rows', 4,       1, 10],
   cols: ['Columns', 10,   1, 10],
 
   init_y: ['Init Y', 3,   0, 10],
@@ -60,7 +61,6 @@ rows: ['Rows', 4,       1, 10],
   goal_y: ['Goal Y', 3,   0, 10],
   goal_x: ['Goal X', 9,   0, 10],
 
-  cliff_penalty: ['Cliff Penalty', 10,   0, 500],
 };
 
 for (const [id, param] of Object.entries(paramData)) {
@@ -410,6 +410,8 @@ function initdom() {
   boxes = document.createElement('div');
   boxes.id = 'boxes';
 
+  const buttons = document.createElement('div');
+  const buttons2 = document.createElement('div');
   const select = document.createElement('select');
   select.id = 'algoSelect';
 
@@ -425,16 +427,15 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  addButton(controls, 'Faster', () => { timeout /= 2 });
-  addButton(controls, 'Slower', () => { timeout *= 2 });
-  addButton(controls, 'Toggle logging', () => { logging = !logging; });
-  addButton(controls, 'Pause', stop_animation);
-  addButton(controls, 'Resume episode', resume_episode);
-  addButton(controls, 'Resume', resume_animation);
-  addButton(controls, 'Step', singleStep);
-  addButton(controls, 'Back', back);
-  addButton(controls, 'Rewind', stop_and_rewind);
-  addButton(controls, 'Tiny', () => {
+  addButton(buttons, 'Faster', () => { timeout /= 2 });
+  addButton(buttons, 'Slower', () => { timeout *= 2 });
+  addButton(buttons, 'Pause', stop_animation);
+  addButton(buttons, 'Resume episode', resume_episode);
+  addButton(buttons, 'Resume', resume_animation);
+  addButton(buttons, 'Step', singleStep);
+  addButton(buttons, 'Back', back);
+  addButton(buttons, 'Rewind', stop_and_rewind);
+  addButton(buttons2, 'Tiny', () => {
     setParam('cols', 3);
     setParam('rows', 1);
     clampParams();
@@ -442,7 +443,7 @@ function initdom() {
     createCanvas();
     stop_and_rewind();
   });
-  addButton(controls, 'Small', () => {
+  addButton(buttons2, 'Small', () => {
     setParam('cols', 5);
     setParam('rows', 2);
     clampParams();
@@ -450,7 +451,7 @@ function initdom() {
     createCanvas();
     stop_and_rewind();
   });
-  addButton(controls, 'Medium', () => {
+  addButton(buttons2, 'Medium', () => {
     setParam('cols', 6);
     setParam('rows', 3);
     clampParams();
@@ -458,7 +459,7 @@ function initdom() {
     createCanvas();
     stop_and_rewind();
   });
-  addButton(controls, 'Large', () => {
+  addButton(buttons2, 'Large', () => {
     setParam('cols', 10);
     setParam('rows', 4);
     clampParams();
@@ -466,6 +467,7 @@ function initdom() {
     createCanvas();
     stop_and_rewind();
   });
+  addButton(buttons2, 'Toggle logging', () => { logging = !logging; });
 
   const stats = document.createElement('div');
   stats.className = 'stats';
@@ -480,6 +482,8 @@ function initdom() {
   srctext.innerHTML =
     '<a href="https://github.com/dominicprior/rl/blob/main/src/main.ts">See on GitHub</a>';
 
+  controls.appendChild(buttons);
+  controls.appendChild(buttons2);
   controls.appendChild(select);
   controls.appendChild(stats);
   controls.appendChild(small);
@@ -506,6 +510,9 @@ function createCanvas() {
 }
 
 function addInput(controls: HTMLDivElement, id: string, param: param) {
+  if (['rows', 'init_y'].includes(id)) {
+    controls.appendChild(document.createElement('div'));
+  }
   controls.appendChild(createNumberInput(id, param))
 }
 
@@ -570,11 +577,11 @@ function addButton(controls: HTMLDivElement, text: string, f: () => void) {
   controls.appendChild(b);
 }
 
-function log(...args: any[]): void {
-  if (logging) {
-    console.log(...args);
-  }
-}
+// function log(...args: any[]): void {
+//   if (logging) {
+//     console.log(...args);
+//   }
+// }
 
 initdom();
 rewind();
