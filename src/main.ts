@@ -44,7 +44,7 @@ let paramData: Record<string, param> = {
 
   // Alpha is the nudge factor for updating a Q value from a successor Q value.
 
-  alpha: ['Alpha', 0.1,   0, 1],
+  alpha: ['Alpha', 0.2,   0, 1],
 
   goalReward: ['Reward', 10, 0, 20],
 
@@ -60,7 +60,7 @@ rows: ['Rows', 4,       1, 10],
   goal_y: ['Goal Y', 3,   0, 10],
   goal_x: ['Goal X', 9,   0, 10],
 
-  cliff_penalty: ['Cliff Penalty', 100,   0, 500],
+  cliff_penalty: ['Cliff Penalty', 10,   0, 500],
 };
 
 for (const [id, param] of Object.entries(paramData)) {
