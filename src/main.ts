@@ -47,17 +47,17 @@ let paramData: Record<string, param> = {
 
   goalReward: ['Reward', 10, 0, 20],
 
-  rows: ['Rows', 1,       1, 10],
-  cols: ['Columns', 3,   1, 10],
+rows: ['Rows', 4,       1, 10],
+  cols: ['Columns', 10,   1, 10],
 
-  init_y: ['Init Y', 0,   0, 10],
+  init_y: ['Init Y', 3,   0, 10],
   init_x: ['Init X', 0,   0, 10],
 
   cliff_start: ['Cliff Start', 1,   0, 10],
-  cliff_end:   ['Cliff End',   0,   0, 10],
+  cliff_end:   ['Cliff End',   8,   0, 10],
 
-  goal_y: ['Goal Y', 0,   0, 10],
-  goal_x: ['Goal X', 2,   0, 10],
+  goal_y: ['Goal Y', 3,   0, 10],
+  goal_x: ['Goal X', 9,   0, 10],
 
   cliff_penalty: ['Cliff Penalty', 100,   0, 500],
 };
