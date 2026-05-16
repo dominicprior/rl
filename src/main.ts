@@ -306,22 +306,25 @@ function draw() {
 
       // Draw the four q-values
       if (!isCliff(s) && !isGoal(s)) {
-        ctx.fillStyle = '#ff0000';
         const q = qValues(s);
         if ('UP' in q) {
-          const ww = Math.min(-q['UP'] * qValueScale, TILE - 4);
+          const ww = qSize(q['UP']);
+          ctx.fillStyle = qColour(q['UP']);
           ctx.fillRect(x * TILE + TILE/2 - ww/2, y * TILE + 3, ww, 2);
         }
         if ('DOWN' in q) {
-          const ww = Math.min(-q['DOWN'] * qValueScale, TILE - 4);
+          const ww = qSize(q['DOWN']);
+          ctx.fillStyle = qColour(q['DOWN']);
           ctx.fillRect(x * TILE + TILE/2 - ww/2, (y+1) * TILE - 4, ww, 2);
         }
         if ('LEFT' in q) {
-          const hh = Math.min(-q['LEFT'] * qValueScale, TILE - 4);
+          const hh = qSize(q['LEFT']);
+          ctx.fillStyle = qColour(q['LEFT']);
           ctx.fillRect(x * TILE + 3, y * TILE + TILE/2 - hh/2, 2, hh);
         }
         if ('RIGHT' in q) {
-          const hh = Math.min(-q['RIGHT'] * qValueScale, TILE - 4);
+          const hh = qSize(q['RIGHT']);
+          ctx.fillStyle = qColour(q['RIGHT']);
           ctx.fillRect((x+1) * TILE - 4, y * TILE + TILE/2 - hh/2, 2, hh);
         }
       }
@@ -335,6 +338,14 @@ function draw() {
   // Write stats
   (document.getElementById('stats') as HTMLDivElement).innerText =
       `Total Steps: ${totalSteps} | Episode: ${episode} | Steps: ${steps} | Reward: ${totalReward}`;
+}
+
+function qSize(qValue: number): number {
+  return Math.min(Math.abs(qValue) * qValueScale, TILE - 4);
+}
+
+function qColour(size: number): string {
+  return size > 0 ? '#000' : '#f00';
 }
 
 function drawArrow(ctx: CanvasRenderingContext2D, s: pair) {
