@@ -32,7 +32,7 @@ let paramData: Record<string, param> = {
 
   // Epsilon is the probability of exploring randomly, as opposed to greedily
   // choosing the action with the highest Q value.  An epsilon of zero means it
-  // always chooses the highest, instead of exploring, which means Q-Learning
+  // always chooses the highest value, instead of exploring, which means Q-Learning
   // and Sarsa are the same.  In this demo, the
   // initial Q values are high (by being zero rather than negative), which
   // makes the agent think every path is amazing until it tries it and is "disappointed."
@@ -159,19 +159,15 @@ function lookupNextState(s: pair, a: dir) {
   if (a === 'RIGHT') x++;
 
   let reward = -1;
-  // let done = false;
 
   if (isCliff([y, x])) {
     reward = -params.cliff_penalty;
     y = params.init_y;
     x = params.init_x;
   }
-  // else if (isGoal([y, x])) {
-  //   reward = 0;
-  //   y = params.init_y;
-  //   x = params.init_x;
-  //   done = true;
-  // }
+  else if (isGoal([y, x])) {
+    reward = params.goalReward;
+  }
   const nextState = [y, x] as pair;
   return { nextState, reward };
 }
@@ -182,14 +178,20 @@ function step(): boolean {
   let pause = false;
   if (isGoal(state)) {  // if we reached the goal last time
     // do second half of the step - we did the updateQ already
+    episode++;
+    totalReward = 0;
+    steps = 0;
     state = [params.init_y, params.init_x];  // teleport to the start
     action = chooseAction(state);
   }
   else {
     // ordinary step, not second half of another step
+    totalSteps++;
+    steps++;
     let { nextState, reward } = lookupNextState(state, action);
+    totalReward += reward;
     if (isGoal(nextState)) {
-      // do the first half of the step - moving onto the goal tile - pause scheduling - done is true
+      // do the first half of the step - moving onto the goal tile
       nudgeQ(state, action, params.goalReward);  // ??? non-zero epsilon?
       state = nextState;  // but no action
       pause = true;
