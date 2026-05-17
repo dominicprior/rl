@@ -457,8 +457,8 @@ function initdom() {
   stats.textContent = 'Total Steps: 0 | Episode: 0 | Steps: 0 | Reward: 0';
 
   const small = document.createElement('small');
-  small.textContent =
-    'Blue = Agent | Pink = Cliff | Green = Goal | Arrows = Policy | Black lines = positive Q values | Red lines = negative Q values';
+  small.innerHTML =
+    'Blue blob = Agent | Pink = Cliff | Green = Goal | Arrows = Policy | Black lines = <b>positive</b> Q values | Red lines = <b>negative</b> Q values';
 
   const srctext = document.createElement('small');
   srctext.innerHTML =
