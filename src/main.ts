@@ -429,14 +429,14 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  addButton(buttons, 'Faster', () => { timeout /= 2 }, 'go faster!<br>really fast');
-  addButton(buttons, 'Slower', () => { timeout *= 2 });
-  addButton(buttons, 'Pause', stop_animation);
-  addButton(buttons, 'Resume episode', resume_episode);
-  addButton(buttons, 'Resume', resume_animation);
-  addButton(buttons, 'Step', singleStep);
-  addButton(buttons, 'Back', back);
-  addButton(buttons, 'Rewind', stop_and_rewind);
+  addButton(buttons, 'Faster', () => { timeout /= 2 }, 'Double the frame rate');
+  addButton(buttons, 'Slower', () => { timeout *= 2 }, 'Half the frame rate');
+  addButton(buttons, 'Pause', stop_animation, 'Pause');
+  addButton(buttons, 'Resume episode', resume_episode, 'Continue until the blob reaches the goal (i.e. when it finishes the current episode)');
+  addButton(buttons, 'Resume', resume_animation, 'Continue indefinitely');
+  addButton(buttons, 'Step', singleStep, 'Advance one step');
+  addButton(buttons, 'Back', back, 'Undo the latest step');
+  addButton(buttons, 'Rewind', stop_and_rewind, 'Rewind all the steps');
   addButton(buttons2, 'Tiny', () => {
     setParam('cols', 3);
     setParam('rows', 1);
@@ -444,7 +444,7 @@ function initdom() {
     setParam('cliff_end', 0);
     createCanvas();
     stop_and_rewind();
-  });
+  }, 'Start again with a tiny world');
   addButton(buttons2, 'Small', () => {
     setParam('cols', 5);
     setParam('rows', 2);
@@ -452,7 +452,7 @@ function initdom() {
     setParam('cliff_end', 3);
     createCanvas();
     stop_and_rewind();
-  });
+  }, '');
   addButton(buttons2, 'Medium', () => {
     setParam('cols', 6);
     setParam('rows', 3);
@@ -460,7 +460,7 @@ function initdom() {
     setParam('cliff_end', 4);
     createCanvas();
     stop_and_rewind();
-  });
+  }, '');
   addButton(buttons2, 'Large', () => {
     setParam('cols', 10);
     setParam('rows', 4);
@@ -468,8 +468,8 @@ function initdom() {
     setParam('cliff_end', 8);
     createCanvas();
     stop_and_rewind();
-  });
-  addButton(buttons2, 'Toggle logging', () => { logging = !logging; });
+  }, '');
+  // addButton(buttons2, 'Toggle logging', () => { logging = !logging; });
 
   const stats = document.createElement('div');
   stats.className = 'stats';
