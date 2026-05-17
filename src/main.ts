@@ -429,7 +429,7 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  addButton(buttons, 'Faster', () => { timeout /= 2 });
+  addButton(buttons, 'Faster', () => { timeout /= 2 }, 'go faster!<br>really fast');
   addButton(buttons, 'Slower', () => { timeout *= 2 });
   addButton(buttons, 'Pause', stop_animation);
   addButton(buttons, 'Resume episode', resume_episode);
@@ -572,10 +572,12 @@ function setParam(param: string, value: number) {
   (document.getElementById(param) as HTMLInputElement).value = '' + value;
 }
 
-function addButton(controls: HTMLDivElement, text: string, f: () => void) {
+function addButton(controls: HTMLDivElement, text: string, f: () => void, tip: string) {
   const b = document.createElement('button');
   b.textContent = text;
   b.addEventListener('click', f);
+  b.setAttribute('class', 'tooltip');
+  b.setAttribute('data-tip', tip);
   controls.appendChild(b);
 }
 
