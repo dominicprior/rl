@@ -20,7 +20,7 @@ const TILE = 60;  // tile size
 
 let timeout = 100;
 let stopAfterEpisode = true;
-let logging = false;
+// let logging = false;
 
 let params: Record<string, number> = {};
 
@@ -438,36 +438,16 @@ function initdom() {
   addButton(buttons, 'Back', back, 'Undo the latest step');
   addButton(buttons, 'Rewind', stop_and_rewind, 'Rewind all the steps');
   addButton(buttons2, 'Tiny', () => {
-    setParam('cols', 3);
-    setParam('rows', 1);
-    clampParams();
-    setParam('cliff_end', 0);
-    createCanvas();
-    stop_and_rewind();
+    setSize(1, 3);
   }, 'Start again with a tiny world');
   addButton(buttons2, 'Small', () => {
-    setParam('cols', 5);
-    setParam('rows', 2);
-    clampParams();
-    setParam('cliff_end', 3);
-    createCanvas();
-    stop_and_rewind();
+    setSize(2, 5);
   }, '');
   addButton(buttons2, 'Medium', () => {
-    setParam('cols', 6);
-    setParam('rows', 3);
-    clampParams();
-    setParam('cliff_end', 4);
-    createCanvas();
-    stop_and_rewind();
+    setSize(3, 6);
   }, '');
   addButton(buttons2, 'Large', () => {
-    setParam('cols', 10);
-    setParam('rows', 4);
-    clampParams();
-    setParam('cliff_end', 8);
-    createCanvas();
-    stop_and_rewind();
+    setSize(4, 10);
   }, '');
   // addButton(buttons2, 'Toggle logging', () => { logging = !logging; });
 
@@ -498,6 +478,19 @@ function initdom() {
   app.appendChild(boxes);
   createCanvas();
   app.appendChild(srctext);
+}
+
+function setSize(rows: number, cols: number) {
+  setParam('rows', rows);
+  setParam('cols', cols);
+  setParam('init_y', rows - 1);
+  setParam('init_x', 0);
+  setParam('goal_y', rows - 1);
+  setParam('goal_x', cols - 1);
+  setParam('cliff_start', 1);
+  setParam('cliff_end', rows === 1 ? 0 : cols - 2);
+  createCanvas();
+  stop_and_rewind();
 }
 
 function createCanvas() {
