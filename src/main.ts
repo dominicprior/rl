@@ -14,7 +14,7 @@ type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
 type pair = [number, number];  // for storing a state
 type historyItem = [ pair, dir, number,     // state, action, Q value
           number, number, number, number ]; // stats
-type param = [label: string, value: number, min: number, max: number];
+type param = [label: string, value: number, min: number, max: number, tip: string];
 
 const TILE = 60;  // tile size
 
@@ -29,7 +29,7 @@ let paramData: Record<string, param> = {
   // Gamma is the discount factor for future rewards.  A value of 1 mean rewards
   // contribute equally to the overall return regardless of when they occur.
 
-  gamma: ['Gamma', 1,   0, 1],
+  gamma: ['Gamma', 1,   0, 1, 'gamma!'],
 
   // Epsilon is the probability of exploring randomly, as opposed to greedily
   // choosing the action with the highest Q value.  An epsilon of zero means it
@@ -512,9 +512,11 @@ function addInput(controls: HTMLDivElement, id: string, param: param) {
 }
 
 function createNumberInput(id: string, param: param) {
-  const [label, value, min, max] = param;
+  const [label, value, min, max, tip] = param;
   params[id] = value;
   const wrapper = document.createElement('span');
+  wrapper.setAttribute('class', 'tooltip');
+  wrapper.setAttribute('data-tip', tip);
   wrapper.style.margin = '10px';
 
   const lbl = document.createElement('label');
