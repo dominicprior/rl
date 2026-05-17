@@ -303,26 +303,20 @@ button { padding: 8px 16px; cursor: pointer; background: #007bff; color: white; 
 button:hover { background: #0056b3; }
 select { padding: 7px; margin: 4px; }
 
-[role="tooltip"] {
-  visibility: hidden;
+.tooltip { position: relative; }
+.tooltip::after {
+  content: attr(data-tip);
   position: absolute;
-  top: 2rem;
-  left: 2rem;
-  background: black;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
   color: white;
-  padding: 0.5rem;
-  border-radius: 0.25rem;
-  /* Give some time before hiding so mouse can exit the input
-  and enter the tooltip */
-  transition: visibility 0.5s;
+  padding: 4px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
 }
-[aria-describedby]:hover,
-[aria-describedby]:focus {
-  position: relative;
-}
-[aria-describedby]:hover + [role="tooltip"],
-[aria-describedby]:focus + [role="tooltip"],
-[role="tooltip"]:hover,
-[role="tooltip"]:focus {
-  visibility: visible;
-}
+.tooltip:hover::after { opacity: 1; }

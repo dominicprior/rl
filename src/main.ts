@@ -429,8 +429,7 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  addButton(buttons, 'Faster', () => { timeout /= 2 }, `go faster!
-  really fast`);
+  addButton(buttons, 'Faster', () => { timeout /= 2 }, 'go faster!<br>really fast');
   addButton(buttons, 'Slower', () => { timeout *= 2 });
   addButton(buttons, 'Pause', stop_animation);
   addButton(buttons, 'Resume episode', resume_episode);
@@ -577,22 +576,9 @@ function addButton(controls: HTMLDivElement, text: string, f: () => void, tip: s
   const b = document.createElement('button');
   b.textContent = text;
   b.addEventListener('click', f);
-  b.setAttribute('aria-describedby', 'myrules');
+  b.setAttribute('class', 'tooltip');
+  b.setAttribute('data-tip', tip);
   controls.appendChild(b);
-  const d = document.createElement('div');
-  d.setAttribute('role', 'tooltip');
-  d.setAttribute('id', 'myrules');
-  d.innerHTML = `  <p>Password Rules:</p>
-  <ul>
-    <li>Minimum of 8 characters</li>
-    <li>
-      Include at least one lowercase letter, one uppercase letter, one number
-      and one special character
-    </li>
-    <li>Unique to this website</li>
-  </ul>
-`;
-  controls.appendChild(d);
 }
 
 // function log(...args: any[]): void {
