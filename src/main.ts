@@ -7,7 +7,6 @@
 //
 // - A graph of the episode lengths.
 // - Split the animation into moving the agent and updating Q.
-// - Add a delay for the cliff and the goal.
 
 import './style.css'
 type dir = 'LEFT' | 'UP' | 'RIGHT' | 'DOWN';
@@ -348,6 +347,11 @@ function draw() {
   ctx.fillText('Cliff',
     (params.cliff_start + params.cliff_end + 0.3) * TILE / 2,
     (params.rows - 0.38) * TILE);
+  if (isGoal(state) && episode === 0) {
+    ctx.font = `${TILE/4}px Arial`;
+    ctx.fillText('Click "Resume" or "Resume Episode" to do more episodes', 
+      2.5 * TILE, (params.goal_y + 0.89) * TILE);
+  }
   // Draw Agent
   ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
   ctx.beginPath();
