@@ -445,7 +445,7 @@ function initdom() {
   addButton(buttons, 'Faster', () => { timeout /= 2 }, 'Double the current frame rate');
   addButton(buttons, 'Slower', () => { timeout *= 2 }, 'Half the current frame rate');
   addButton(buttons, 'Pause', stop_animation, 'Pause');
-  addButton(buttons, 'Resume episode', resume_episode, 'Continue until the end of the episode (i.e. when we reach the goal)');
+  addButton(buttons, 'Resume episode', resume_episode, 'Continue until the end of the episode (i.e. until we reach the goal)');
   addButton(buttons, 'Resume', resume_animation, 'Continue indefinitely or until paused');
   addButton(buttons, 'Step', singleStep, 'Take one step');
   addButton(buttons, 'Back', back, 'Undo a step');
