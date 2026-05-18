@@ -426,7 +426,7 @@ function initdom() {
   const buttons2 = document.createElement('div');
   const selectWrapper = document.createElement('div');
   const select = document.createElement('select');
-  addTip(selectWrapper, 'The learning strategy for updating the Q value after every step');
+  addTip(selectWrapper, 'The learning strategy for updating the Q values');
 
   select.id = 'algoSelect';
 
