@@ -349,8 +349,8 @@ function draw() {
     (params.rows - 0.38) * TILE);
   if (isGoal(state) && episode === 0) {
     ctx.font = `${TILE/4}px Arial`;
-    ctx.fillText('Click "Resume" or "Resume Episode" to do more episodes', 
-      2.5 * TILE, (params.goal_y + 0.89) * TILE);
+    ctx.fillText('Click "Resume" or "Resume Episode" to continue', 
+      3.7 * TILE, (params.goal_y + 0.89) * TILE);
   }
   // Draw Agent
   ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
@@ -442,8 +442,8 @@ function initdom() {
     select.appendChild(optionEl);
   }
 
-  addButton(buttons, 'Faster', () => { timeout /= 2 }, 'Double the frame rate');
-  addButton(buttons, 'Slower', () => { timeout *= 2 }, 'Half the frame rate');
+  addButton(buttons, 'Faster', () => { timeout /= 2 }, 'Double the current frame rate');
+  addButton(buttons, 'Slower', () => { timeout *= 2 }, 'Half the current frame rate');
   addButton(buttons, 'Pause', stop_animation, 'Pause');
   addButton(buttons, 'Resume episode', resume_episode, 'Continue until the end of the episode (i.e. when we reach the goal)');
   addButton(buttons, 'Resume', resume_animation, 'Continue indefinitely or until paused');
