@@ -432,11 +432,11 @@ function initdom() {
   addButton(buttons, 'Faster', () => { timeout /= 2 }, 'Double the frame rate');
   addButton(buttons, 'Slower', () => { timeout *= 2 }, 'Half the frame rate');
   addButton(buttons, 'Pause', stop_animation, 'Pause');
-  addButton(buttons, 'Resume episode', resume_episode, 'Continue until the blob reaches the goal (i.e. when it finishes the current episode)');
-  addButton(buttons, 'Resume', resume_animation, 'Continue indefinitely');
-  addButton(buttons, 'Step', singleStep, 'Advance one step');
-  addButton(buttons, 'Back', back, 'Undo the latest step');
-  addButton(buttons, 'Rewind', stop_and_rewind, 'Rewind all the steps');
+  addButton(buttons, 'Resume episode', resume_episode, 'Continue until the end of the episode (i.e. when we reach the goal)');
+  addButton(buttons, 'Resume', resume_animation, 'Continue indefinitely or until paused');
+  addButton(buttons, 'Step', singleStep, 'Take one step');
+  addButton(buttons, 'Back', back, 'Undo a step');
+  addButton(buttons, 'Rewind', stop_and_rewind, 'Rewind all the way to the beginning');
   addButton(buttons2, 'Tiny', () => {
     setSize(1, 3);
   }, 'Start again with a tiny world');
