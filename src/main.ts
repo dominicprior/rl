@@ -416,7 +416,7 @@ function initdom() {
   app = (document.querySelector<HTMLDivElement>('#app') as HTMLDivElement);
 
   const heading = document.createElement('h2');
-  heading.textContent = 'Cliff Walking Reinforcement Learning';
+  heading.textContent = 'Reinforcement Learning Demo';
 
   const controls = document.createElement('div');
   boxes = document.createElement('div');
@@ -424,7 +424,10 @@ function initdom() {
 
   const buttons = document.createElement('div');
   const buttons2 = document.createElement('div');
+  const selectWrapper = document.createElement('div');
   const select = document.createElement('select');
+  addTip(selectWrapper, 'The learning strategy for updating the Q value after every step');
+
   select.id = 'algoSelect';
 
   const options = [
@@ -465,6 +468,7 @@ function initdom() {
   stats.className = 'stats';
   stats.id = 'stats';
   stats.textContent = 'Total Steps: 0 | Episode: 0 | Steps: 0 | Reward: 0';
+  addTip(stats, 'An "episode" is one journey from the start to the goal');
 
   const small = document.createElement('small');
   small.innerHTML =
@@ -476,7 +480,8 @@ function initdom() {
 
   controls.appendChild(buttons);
   controls.appendChild(buttons2);
-  controls.appendChild(select);
+  controls.appendChild(selectWrapper);
+  selectWrapper.appendChild(select);
   controls.appendChild(stats);
   controls.appendChild(small);
   for (const [id, param] of Object.entries(paramData)) {
@@ -488,6 +493,11 @@ function initdom() {
   app.appendChild(boxes);
   createCanvas();
   app.appendChild(srctext);
+}
+
+function addTip(element: HTMLElement, tip: string) {
+  element.setAttribute('class', 'tooltip');
+  element.setAttribute('data-tip', tip);
 }
 
 function setSize(rows: number, cols: number) {
@@ -525,8 +535,7 @@ function createNumberInput(id: string, param: param) {
   const [label, value, min, max, tip] = param;
   params[id] = value;
   const wrapper = document.createElement('span');
-  wrapper.setAttribute('class', 'tooltip');
-  wrapper.setAttribute('data-tip', tip);
+  addTip(wrapper, tip);
   wrapper.style.margin = '10px';
 
   const lbl = document.createElement('label');
@@ -581,8 +590,7 @@ function addButton(controls: HTMLDivElement, text: string, f: () => void, tip: s
   const b = document.createElement('button');
   b.textContent = text;
   b.addEventListener('click', f);
-  b.setAttribute('class', 'tooltip');
-  b.setAttribute('data-tip', tip);
+  addTip(b, tip);
   controls.appendChild(b);
 }
 
