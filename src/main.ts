@@ -29,7 +29,7 @@ let paramData: Record<string, param> = {
   // Gamma is the discount factor for future rewards.  A value of 1 mean rewards
   // contribute equally to the overall return regardless of when they occur.
 
-  gamma: ['Gamma', 1,   0, 1, 'gamma!'],
+  gamma: ['Gamma', 1,   0, 1, 'The discount factor for future rewards'],
 
   // Epsilon is the probability of exploring randomly, as opposed to greedily
   // choosing the action with the highest Q value.  An epsilon of zero means it
@@ -40,26 +40,26 @@ let paramData: Record<string, param> = {
   // This forces it to traverse almost every arc in the graph at least once
   // before it settles on a favourite.
 
-  epsilon: ['Epsilon', 0,   0, 1],
+  epsilon: ['Epsilon', 0,   0, 1, 'How often to explore randomly, as opposed to choosing the best action'],
 
   // Alpha is the nudge factor for updating a Q value from a successor Q value.
 
-  alpha: ['Alpha', 0.2,   0, 1],
+  alpha: ['Alpha', 0.2,   0, 1, 'The learning rate: the proportion of the q-value adjustments towards a target value'],
 
-  goalReward: ['Reward', 10, 0, 20],
+  goalReward: ['Reward', 10, 0, 20, 'The reward for reaching the goal'],
 
-  cliff_penalty: ['Cliff Penalty', 10,   0, 500],
-  rows: ['Rows', 4,       1, 10],
-  cols: ['Columns', 10,   1, 10],
+  cliff_penalty: ['Cliff Penalty', 10,   0, 500, 'The negative reward for falling off the cliff'],
+  rows: ['Rows', 4,       1, 10, 'Number of rows'],
+  cols: ['Columns', 10,   1, 10, 'Number of columns'],
 
-  init_y: ['Init Y', 3,   0, 10],
-  init_x: ['Init X', 0,   0, 10],
+  init_y: ['Init Y', 3,   0, 10, 'The y-coord (counting from the top from zero) of the initial tile'],
+  init_x: ['Init X', 0,   0, 10, 'The x-coord (counting from zero) of the initial tile'],
 
-  cliff_start: ['Cliff Start', 1,   0, 10],
-  cliff_end:   ['Cliff End',   8,   0, 10],
+  cliff_start: ['Cliff Start', 1,   0, 10, 'The x-coord of the first cliff tile'],
+  cliff_end:   ['Cliff End',   8,   0, 10, 'The x-coord of the last cliff tile'],
 
-  goal_y: ['Goal Y', 3,   0, 10],
-  goal_x: ['Goal X', 9,   0, 10],
+  goal_y: ['Goal Y', 3,   0, 10, 'The y-coord of the goal tile'],
+  goal_x: ['Goal X', 9,   0, 10, 'The x-coord of the goal tile'],
 
 };
 
