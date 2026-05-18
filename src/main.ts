@@ -505,7 +505,7 @@ function createCanvas() {
 }
 
 function addInput(controls: HTMLDivElement, id: string, param: param) {
-  if (['rows', 'init_y'].includes(id)) {
+  if (['rows', 'init_y', 'goal_y'].includes(id)) {
     controls.appendChild(document.createElement('div'));
   }
   controls.appendChild(createNumberInput(id, param))
