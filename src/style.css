@@ -309,7 +309,7 @@ select { padding: 7px; margin: 4px; }
   position: absolute;
   bottom: 125%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-40%);
   background: #333;
   color: white;
   padding: 4px 8px;
