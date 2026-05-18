@@ -342,6 +342,12 @@ function draw() {
       }
     }
   }
+  ctx.fillStyle = "#222";
+  // ctx.fillText('Start', (params.init_x + 0.12) * TILE, (params.init_y + 0.62) * TILE);
+  ctx.fillText('Goal',  (params.goal_x + 0.15) * TILE, (params.goal_y + 0.62) * TILE);
+  ctx.fillText('Cliff',
+    (params.cliff_start + params.cliff_end + 0.3) * TILE / 2,
+    (params.rows - 0.38) * TILE);
   // Draw Agent
   ctx.fillStyle = 'rgba(0, 0, 255, 0.5)';
   ctx.beginPath();
